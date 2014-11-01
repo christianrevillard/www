@@ -1,0 +1,292 @@
+
+C:\Users\Christian\Development\Projects\www>call deployCreanvas 
+
+C:\Users\Christian\Development\Projects\www>REM  Staring in Projects/www 
+
+C:\Users\Christian\Development\Projects\www>cd ..\Libs\CreanvasJS 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasJs>java -jar ..\..\..\Tools\closure-compiler\compiler.jar --js 	./Core/*.js 	./Creanvas/*.js 	./Creanvas/ElementDecorators/*.js 	./Creevents/*.js 	./CreHelpers/*.js 	./Crelog/*.js 	./CreanvasNodeClient/*.js --js_output_file ..\..\www\resources\lib\Creanvas.js --define TEST=false --define DEBUG=false --externs ./externs.js --compilation_level ADVANCED_OPTIMIZATIONS 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasJs>REM --compilation_level WHITESPACE_ONLY 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasJs>REM --compilation_level SIMPLE_OPTIMIZATIONS 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasJs>REM --formatting=pretty_print ^ 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasJs>cd ..\..\www 
+
+C:\Users\Christian\Development\Projects\www>call deployNodeServer 
+
+C:\Users\Christian\Development\Projects\www>REM  Staring in Projects/www, 
+
+C:\Users\Christian\Development\Projects\www>cd ..\Libs\NodeServer 
+
+C:\Users\Christian\Development\Projects\Libs\NodeServer>copy Handlers\Generic\* ..\..\www\Handlers\Generic\ 
+Handlers\Generic\PageNotFoundHandler.js
+Handlers\Generic\ResourceFileAliasHandler.js
+Handlers\Generic\ResourceFileHandler.js
+        3 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\Libs\NodeServer>copy Handlers\Sockets\* ..\..\www\Handlers\Sockets\ 
+Handlers\Sockets\ConnectSocket.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\Libs\NodeServer>copy ServerCore\* ..\..\www\ServerCore\ 
+ServerCore\ResponseHandler.js
+ServerCore\Server.js
+        2 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\Libs\NodeServer>cd ..\..\www 
+
+C:\Users\Christian\Development\Projects\www>call deployCreanvasNodeModule 
+
+C:\Users\Christian\Development\Projects\www>REM  Staring in Projects/www 
+
+C:\Users\Christian\Development\Projects\www>cd ..\Libs\CreanvasNodeModule\Client 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasNodeModule\Client>java -jar ..\..\..\..\Tools\closure-compiler\compiler.jar --js 	./*.js --js_output_file ..\..\..\www\resources\lib\CreanvasNodeClient.js --define TEST=false --define DEBUG=true --compilation_level WHITESPACE_ONLY 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasNodeModule\Client>REM --compilation_level ADVANCED_OPTIMIZATIONS 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasNodeModule\Client>REM --compilation_level SIMPLE_OPTIMIZATIONS 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasNodeModule\Client>cd .. 
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasNodeModule>copy Server\* ..\..\www\CreanvasNodeModule\ 
+Server\Decorators.js
+Server\ServerController.js
+Server\ServerElement.js
+Server\Vector.js
+        4 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\Libs\CreanvasNodeModule>cd ..\..\www 
+
+C:\Users\Christian\Development\Projects\www>cd ..\WebClientApps 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd chess 
+
+C:\Users\Christian\Development\Projects\WebClientApps\chess>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\chess>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\chess>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\chess.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\chess>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\chess.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\chess>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd collision 
+
+C:\Users\Christian\Development\Projects\WebClientApps\collision>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\collision>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\collision>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\collision.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\collision>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\collision.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\collision>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd flipper 
+
+C:\Users\Christian\Development\Projects\WebClientApps\flipper>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\flipper>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\flipper>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\flipper.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\flipper>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\flipper.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\flipper>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd jsevents 
+
+C:\Users\Christian\Development\Projects\WebClientApps\jsevents>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\jsevents>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\jsevents>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\jsevents.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\jsevents>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\jsevents.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\jsevents>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd performance 
+
+C:\Users\Christian\Development\Projects\WebClientApps\performance>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\performance>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\performance>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\performance.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\performance>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\performance.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\performance>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd solarSystem 
+
+C:\Users\Christian\Development\Projects\WebClientApps\solarSystem>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\solarSystem>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\solarSystem>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\solarSystem.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\solarSystem>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\planet.js
+js\solarSystem.js
+js\solarSystemController.js
+        3 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\solarSystem>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd testSuite 
+
+C:\Users\Christian\Development\Projects\WebClientApps\testSuite>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\testSuite>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\testSuite>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\testSuite.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\testSuite>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\testSuite.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\testSuite>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd tictactoe 
+
+C:\Users\Christian\Development\Projects\WebClientApps\tictactoe>call ..\..\www\deployWebClientApp.bat 
+
+C:\Users\Christian\Development\Projects\WebClientApps\tictactoe>if exist css\*.csss copy css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebClientApps\tictactoe>if exist html\*.html copy html\* ..\..\www\resources\html\ 
+html\tictactoe.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\tictactoe>if exist js\*.js copy js\* ..\..\www\resources\js\ 
+js\tictactoe.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebClientApps\tictactoe>cd .. 
+
+C:\Users\Christian\Development\Projects\WebClientApps>cd ..\www 
+
+C:\Users\Christian\Development\Projects\www>cd ..\WebServerApps 
+
+C:\Users\Christian\Development\Projects\WebServerApps>cd ajaxTest 
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>call ..\..\www\deployWebServerApp.bat 
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>if exist Client\css\*.css copy Client\css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>if exist Client\html\*.html copy Client\html\* ..\..\www\resources\html\ 
+Client\html\ajaxTest.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>if exist Client\js\*.js copy Client\js\* ..\..\www\resources\js\ 
+Client\js\myTestModule.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>if exist Server\Pages\*.js copy Server\Pages\* ..\..\www\Handlers\Pages\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>if exist Server\Sockets\*.js copy Server\Sockets\* ..\..\www\Handlers\Sockets\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>if exist Server\Ajax\*.js copy Server\Ajax\* ..\..\www\Handlers\Ajax\ 
+Server\Ajax\TestAjaxHandler.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\ajaxTest>cd .. 
+
+C:\Users\Christian\Development\Projects\WebServerApps>cd chat 
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>call ..\..\www\deployWebServerApp.bat 
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>if exist Client\css\*.css copy Client\css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>if exist Client\html\*.html copy Client\html\* ..\..\www\resources\html\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>if exist Client\js\*.js copy Client\js\* ..\..\www\resources\js\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>if exist Server\Pages\*.js copy Server\Pages\* ..\..\www\Handlers\Pages\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>if exist Server\Sockets\*.js copy Server\Sockets\* ..\..\www\Handlers\Sockets\ 
+Server\Sockets\chatSocket.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>if exist Server\Ajax\*.js copy Server\Ajax\* ..\..\www\Handlers\Ajax\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\chat>cd .. 
+
+C:\Users\Christian\Development\Projects\WebServerApps>cd collision 
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>call ..\..\www\deployWebServerApp.bat 
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>if exist Client\css\*.css copy Client\css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>if exist Client\html\*.html copy Client\html\* ..\..\www\resources\html\ 
+Client\html\collisionClient.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>if exist Client\js\*.js copy Client\js\* ..\..\www\resources\js\ 
+Client\js\collisionClient.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>if exist Server\Pages\*.js copy Server\Pages\* ..\..\www\Handlers\Pages\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>if exist Server\Sockets\*.js copy Server\Sockets\* ..\..\www\Handlers\Sockets\ 
+Server\Sockets\collisionSocket.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>if exist Server\Ajax\*.js copy Server\Ajax\* ..\..\www\Handlers\Ajax\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\collision>cd .. 
+
+C:\Users\Christian\Development\Projects\WebServerApps>cd tictactoe 
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>call ..\..\www\deployWebServerApp.bat 
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>if exist Client\css\*.css copy Client\css\* ..\..\www\resources\css\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>if exist Client\html\*.html copy Client\html\* ..\..\www\resources\html\ 
+Client\html\tictactoeClient.html
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>if exist Client\js\*.js copy Client\js\* ..\..\www\resources\js\ 
+Client\js\tictactoeClient.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>if exist Server\Pages\*.js copy Server\Pages\* ..\..\www\Handlers\Pages\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>if exist Server\Sockets\*.js copy Server\Sockets\* ..\..\www\Handlers\Sockets\ 
+Server\Sockets\tictactoeSocket.js
+        1 fil(er) ble kopiert.
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>if exist Server\Ajax\*.js copy Server\Ajax\* ..\..\www\Handlers\Ajax\ 
+
+C:\Users\Christian\Development\Projects\WebServerApps\tictactoe>cd .. 
+
+C:\Users\Christian\Development\Projects\WebServerApps>cd ..\www 

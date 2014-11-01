@@ -1,0 +1,78 @@
+<html>
+	<head>
+		<meta 
+			http-equiv="Content-Type" 
+			content="text/html; charset=UTF-8" />
+
+		<script src="../js/myTestModule.js"></script>
+		
+		<script type='text/javascript'>
+			var isRunning = false;
+		
+			var clickAjax = function()
+			{
+				isRunning = true;
+				
+				moveText();
+			}
+
+			var moveText = function()
+			{
+				setTimeout (
+					function()
+					{
+						myTestModule
+							.ajaxTest(
+								document
+									.getElementById('ajaxResponse')
+									.innerHTML);
+						
+						if (isRunning)
+						{
+							moveText();
+						}
+					},
+					100
+				);
+			};
+			
+			var stopAjax = function()
+			{
+				isRunning = false;
+			}
+
+		</script>
+
+	</head>
+	
+	<body>	
+		<table>
+			<tr>
+				<td>
+					Basic js include
+				</td>
+				<td>
+					<a href="javascript:myTestModule.helloWorld()">Hello</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Test ajax call
+				</td>
+				<td>
+					<a href="javascript:clickAjax();">Start rotate</a><br>
+					<a href="javascript:stopAjax();">Stop rotate</a><br>
+					<div id="ajaxResponse">Testing-ajax-request-and-response-</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Test bookmarklet
+				</td>
+				<td>
+					<a href="javascript:myTestModule.bookmarklet();">Bookmarklet</a><br>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

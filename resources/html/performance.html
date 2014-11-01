@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<meta 
+			http-equiv="Content-Type" 
+			content="text/html; charset=UTF-8" />
+  			
+  			<script src="../js/performance.js"></script>
+	</head>
+</html>
+<body onload='onload();'>
+	<table>
+		<tr>
+			<td colspan="2">				
+				<canvas 
+					id="theCanvas" 
+					width="150" 
+					height="150" 
+					style="border:1px solid black;"> 
+				</canvas>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">100 iterations of (ms)</td>					
+		</tr>
+		<tr><td>Manual draw</td><td><div id="divManual" /></tr>
+		<tr><td>Image data, tempContext, excl. start draw</td><td><div id="divtempExcl" /></tr>
+		<tr><td>Image data, tempContext, incl. start draw</td><td><div id="divTempIncl" /></tr>
+		<tr><td>Image data, same Context, excl. start draw</td><td><div id="divSameExcl" /></tr>
+		<tr><td>Image data, same Context, incl. start draw</td><td><div id="divSameIncl" /></tr>				
+	</table>
+</body>

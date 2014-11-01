@@ -1,0 +1,22 @@
+.WhiteCell, .blackCell 
+{
+	height:50px;
+	width:50px;
+	overflow:hidden;
+	vertical-align:middle;
+	text-align:center;
+}
+
+.whiteCell 
+{
+	background:white;
+}
+
+.blackCell 
+{
+	background:black;
+}
+
+.pion
+{
+}

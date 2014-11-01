@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<meta 
+			http-equiv="Content-Type" 
+			content="text/html; charset=UTF-8" />
+		<script src="../js/jsevents.js"></script>
+		<style>                         
+			.popUp {                        
+			  font: bold 12pt sans;         
+			  background: lightblue;             
+			  padding: 3px;                
+			  border: solid blue 2px;      
+			  border-radius: 8px;   
+			  width:450px;       
+			}
+
+			.lastEvent{                        
+			  font: bold 18pt sans;         
+			  border: solid blue 4px;      
+			}
+			
+			.log
+			{
+				float:left;
+				width:90%;
+			}
+			
+			.count
+			{
+				color:red;
+			}
+		</style>
+	</head>
+	<body id="theBody" onload="bodyOnLoad();">	
+		<div id="testControls">
+			<table>
+				<tr>
+					<td>A button </td>
+					<td><input type='button' value='button' id='theButton'/></td>
+				</tr>
+				<tr>
+					<td>A text element </td>
+					<td><input type='text' value="text" id='theText'/></td>
+				</tr>
+				<tr>
+					<td>A text area </td>
+					<td><input type='textarea' value="text" id='theTextArea'/></td>
+				</tr>
+				<tr>
+					<td>A div</td>
+					<td><div id="theDiv">just a div</div></td>
+				</tr>
+				<tr>
+					<td>A draggable div</td>
+					<td><div id="theDraggableDiv" draggable="true">just a div</div></td>
+					</tr>
+				<tr>
+					<td>An audio control</td>
+					<td><audio controls id="theAudio"> 
+						<source src="/files/sound/test.ogg" type="audio/ogg">
+						Your browser does not support the audio element.</audio></td>
+				</tr>
+				<tr>
+					<td>A canvas</td>
+					<td><canvas style="width:200px;height:50px;border;1px solid black;" id="theCanvas"></td>
+				</tr>
+			</table>
+						
+		</div>				
+		<div 
+			id="eventPopUp"
+			style="position:absolute;left:300px;top:50px;"></div>
+		<div style="display:none;">
+			<div 
+				id="eventTemplate" 
+				class="popUp"></div>
+			<span id="logTemplate" class="log"></span>
+			<span id="countTemplate" class="count"></span>
+		</div>
+	</body>
+</html>
