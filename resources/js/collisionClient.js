@@ -15,6 +15,25 @@ CreCollision.onload = function ()
 		"canvas":theCanvas
 		});
 
+
+	controller.addElementType(
+		"wall",
+		function (context) {
+			context.fillStyle = "#000";
+			context.fillRect(-10,-250,20,500);
+		},
+		// toDO:edgeresolution according to width/height
+		{width:20, height:500, edgeResolution:20});		
+
+	controller.addElementType(
+		"top",
+		function (context) {
+			context.fillStyle = "#000";
+			context.fillRect(-350,-10,700,20);
+		},
+		// toDO:edgeresolution according to width/height
+		{width:700, height:20, edgeResolution:20});		
+
 	controller.addElementType(
 		"round",
 		function (context) {
@@ -29,6 +48,6 @@ CreCollision.onload = function ()
 			context.fillStyle = gradient;
 			context.fill();
 		},
-		{width:150, height:150}		
+		{width:150, height:150, edgeResolution:20}		
 	);
 };
