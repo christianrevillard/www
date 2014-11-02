@@ -4,7 +4,7 @@ call deployCreanvas
 call deployNodeServer
 call deployCreanvasNodeModule
 
-cd ..\WebClientApps
+cd \Users\Christian\Development\Projects\WebClientApps
 cd chess
 call ..\..\www\deployWebClientApp.bat
 cd ..

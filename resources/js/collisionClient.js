@@ -2,10 +2,10 @@ var CreCollision = CreCollision || {};
 
 CreCollision.onload = function ()
 {		
-	// openshift websocket on 8000 or secure on 8443 - must configurable !!!	
-	var socket = io("http://nodejs-creweb.rhcloud.com:8000/collision");
-	// local version
-	//var socket = io("/collision");
+	var socket = 
+		window.location.href.indexOf('rhcloud.com')>-1?
+	    io("http://nodejs-creweb.rhcloud.com:8000/collision"):
+		io("/collision");
 
 	var theCanvas = document.getElementById('theCanvas');
 

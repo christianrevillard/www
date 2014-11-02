@@ -1,7 +1,6 @@
 @echo ON
 
-REM  Staring in Projects/www
-cd ..\Libs\CreanvasJS
+cd \Users\Christian\Development\Projects\Libs\CreanvasJS
 
 java ^
 -jar ..\..\..\Tools\closure-compiler\compiler.jar ^

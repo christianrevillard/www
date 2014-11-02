@@ -1,7 +1,6 @@
 @echo ON
 
-REM  Staring in Projects/www
-cd ..\Libs\CreanvasNodeModule\Client
+cd \Users\Christian\Development\Projects\Libs\CreanvasNodeModule\Client
 
 
 java ^
