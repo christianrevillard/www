@@ -10,6 +10,7 @@ java ^
 --js_output_file ..\..\..\www\resources\lib\CreanvasNodeClient.js ^
 --define TEST=false ^
 --define DEBUG=true ^
+--formatting=pretty_print ^
 --compilation_level WHITESPACE_ONLY
 
 REM --compilation_level ADVANCED_OPTIMIZATIONS

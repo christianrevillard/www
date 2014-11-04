@@ -15,7 +15,6 @@ CreCollision.onload = function ()
 		"canvas":theCanvas
 		});
 
-
 	controller.addElementType(
 		"wall",
 		function (context) {
@@ -23,7 +22,7 @@ CreCollision.onload = function ()
 			context.fillRect(-10,-250,20,500);
 		},
 		// toDO:edgeresolution according to width/height
-		{width:20, height:500, edgeResolution:20});		
+		{width:20, height:500, edgeResolution:5});		
 
 	controller.addElementType(
 		"top",
@@ -32,7 +31,7 @@ CreCollision.onload = function ()
 			context.fillRect(-350,-10,700,20);
 		},
 		// toDO:edgeresolution according to width/height
-		{width:700, height:20, edgeResolution:20});		
+		{width:700, height:20, edgeResolution:5});		
 
 	controller.addElementType(
 		"round",
@@ -48,6 +47,25 @@ CreCollision.onload = function ()
 			context.fillStyle = gradient;
 			context.fill();
 		},
-		{width:150, height:150, edgeResolution:20}		
+		{width:100, height:100, edgeResolution:5}		
 	);
+	
+	controller.addElementType(
+			"redRound",
+			function (context) {
+				var color1, color2;
+				color1 =  "#F88";
+				color2= "#DDD";
+
+				context.scale(3,1);
+				context.arc(0,0,25,0,2*Math.PI);
+				var gradient = context.createRadialGradient(0,0,25,25,-5,3);
+				gradient.addColorStop(0.0,color1);
+				gradient.addColorStop(1.0,color2);
+				context.fillStyle = gradient;
+				context.fill();
+				context.scale(1/3,1);
+			},
+			{width:150, height:50, edgeResolution:5}		
+		);
 };

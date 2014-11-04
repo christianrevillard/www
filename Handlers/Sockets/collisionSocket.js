@@ -66,17 +66,17 @@ var CollisionTest = function(collision, socket){
 	this.controller.addElement
 	(
 		["name", "round1"],
-		["image", { "width":200,"height":200, "typeName": 'round'}],
+		["image", { "width":100,"height":100, "typeName": 'round'}],
 		["position", {"x": 200, "y": 100}],			
 		["solid", {mass:1}],
 		["clickable", {}],
-		["moving", {vx:100}]
+		["moving", {vx:200}]
 	);
 
 	this.controller.addElement
 	(
 		["name", "round2"],
-		["image", { "width":200,"height":200, "typeName": 'round'}],
+		["image", { "width":100,"height":100, "typeName": 'round'}],
 		["position", {"x": 500, "y": 250}],			
 		["solid", {mass:1}],
 		["moving", {vx:-200}]
@@ -85,13 +85,22 @@ var CollisionTest = function(collision, socket){
 	this.controller.addElement
 	(
 		["name", "round3"],
-		["image", { "width":200,"height":200, "typeName": 'round'}],
-		["position", {"x": 400, "y": 100, "scaleX":2}],			
+		["image", { "width":100,"height":100, "typeName": 'round'}],
+		["position", {"x": 400, "y": 100}],			
 		["solid", {mass:1}],
 		["clickable", {}],
-		["moving", {vy:50}]
+		["moving", {vy:150}]
 	);
 
+	this.controller.addElement
+	(
+		["name", "round4"],
+		["image", { "width":150,"height":50, "typeName": 'redRound'}],
+		["position", {"x": 350, "y": 400}],			
+		["solid", {mass:5}],
+		["clickable", {}],
+		["moving", {vx:50,vy:50}]
+	);
 	
 	this.disconnect = function()
 	{
