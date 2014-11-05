@@ -183,6 +183,21 @@ if (TEST) {
     }
     return xy;
   };
+  creanvas.NodeJsController.prototype.getCorners = function(boxData) {
+    var controller = this;
+    var corners = [];
+    var width = boxData["width"];
+    var height = boxData["height"];
+    var top = boxData["top"] == 0 ? 0 : boxData["top"] || -height / 2;
+    var left = boxData["left"] == 0 ? 0 : boxData["left"] || -width / 2;
+    var bottom = boxData["bottom"] == 0 ? 0 : boxData["bottom"] || top + height;
+    var right = boxData["right"] == 0 ? 0 : boxData["right"] || left + width;
+    corners.push({x:left, y:top});
+    corners.push({x:right, y:top});
+    corners.push({x:right, y:bottom});
+    corners.push({x:left, y:bottom});
+    return corners;
+  };
   creanvas.NodeJsController.prototype.getEdges = function(draw, boxData) {
     var controller = this;
     var edges = [];
@@ -212,7 +227,7 @@ if (TEST) {
     var imageX = null;
     var imageY = null;
     var currentEdge = null;
-    var checkPoint = function(x, y, edge) {
+    var checkPoint = function(x, y, edge, isCorner) {
       if (edgeImage.data[y * tempCanvas.width * 4 + x * 4 + 3] < transparencyLimit) {
         return false;
       }
@@ -240,7 +255,7 @@ if (TEST) {
       if (!match) {
         return;
       }
-      edges.push({x:(x + dx) * edgeResolution + left, y:(y + dy) * edgeResolution + top});
+      edges.push({x:(x + dx) * edgeResolution + left, y:(y + dy) * edgeResolution + top, isCorner:isCorner});
       imageX = x;
       imageY = y;
       currentEdge = edge;
@@ -248,7 +263,7 @@ if (TEST) {
     };
     for (var forX = 0;forX < tempCanvas.width;forX++) {
       for (var forY = 0;forY < tempCanvas.height;forY++) {
-        if (checkPoint(forX, forY, "top")) {
+        if (checkPoint(forX, forY, "top", true)) {
           startEdge = {x:imageX, y:imageY};
           forX = tempCanvas.width;
           forY = tempCanvas.height;
@@ -258,46 +273,46 @@ if (TEST) {
     if (startEdge) {
       do {
         if (currentEdge == "top") {
-          if (imageX < tempCanvas.width - 1 && imageY > 0 && checkPoint(imageX + 1, imageY - 1, "left")) {
+          if (imageX < tempCanvas.width - 1 && imageY > 0 && checkPoint(imageX + 1, imageY - 1, "left", true)) {
             continue;
           }
-          if (imageX < tempCanvas.width - 1 && checkPoint(imageX + 1, imageY, "top")) {
+          if (imageX < tempCanvas.width - 1 && checkPoint(imageX + 1, imageY, "top", false)) {
             continue;
           }
-          if (checkPoint(imageX, imageY, "right")) {
+          if (checkPoint(imageX, imageY, "right", true)) {
             continue;
           }
         } else {
           if (currentEdge == "right") {
-            if (imageX < tempCanvas.width - 1 && imageY < tempCanvas.height - 1 && checkPoint(imageX + 1, imageY + 1, "top")) {
+            if (imageX < tempCanvas.width - 1 && imageY < tempCanvas.height - 1 && checkPoint(imageX + 1, imageY + 1, "top", true)) {
               continue;
             }
-            if (imageY < tempCanvas.height - 1 && checkPoint(imageX, imageY + 1, "right")) {
+            if (imageY < tempCanvas.height - 1 && checkPoint(imageX, imageY + 1, "right", false)) {
               continue;
             }
-            if (checkPoint(imageX, imageY, "bottom")) {
+            if (checkPoint(imageX, imageY, "bottom", true)) {
               continue;
             }
           } else {
             if (currentEdge == "bottom") {
-              if (imageX > 0 && imageY < tempCanvas.height - 1 && checkPoint(imageX - 1, imageY + 1, "right")) {
+              if (imageX > 0 && imageY < tempCanvas.height - 1 && checkPoint(imageX - 1, imageY + 1, "right", true)) {
                 continue;
               }
-              if (imageX > 0 && checkPoint(imageX - 1, imageY, "bottom")) {
+              if (imageX > 0 && checkPoint(imageX - 1, imageY, "bottom", false)) {
                 continue;
               }
-              if (checkPoint(imageX, imageY, "left")) {
+              if (checkPoint(imageX, imageY, "left", true)) {
                 continue;
               }
             } else {
               if (currentEdge == "left") {
-                if (imageX > 0 && imageY > 0 && checkPoint(imageX - 1, imageY - 1, "bottom")) {
+                if (imageX > 0 && imageY > 0 && checkPoint(imageX - 1, imageY - 1, "bottom", true)) {
                   continue;
                 }
-                if (imageY > 0 && checkPoint(imageX, imageY - 1, "left")) {
+                if (imageY > 0 && checkPoint(imageX, imageY - 1, "left", false)) {
                   continue;
                 }
-                if (checkPoint(imageX, imageY, "top")) {
+                if (checkPoint(imageX, imageY, "top", true)) {
                   continue;
                 }
               }
