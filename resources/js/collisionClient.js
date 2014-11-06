@@ -19,19 +19,19 @@ CreCollision.onload = function ()
 		"wall",
 		function (context) {
 			context.fillStyle = "#000";
-			context.fillRect(-10,-250,20,500);
+			context.fillRect(-2,-250,4,500);
 		},
 		// toDO:edgeresolution according to width/height
-		{width:20, height:500, edgeResolution:5});		
+		{width:4, height:500, edgeResolution:5});		
 
 	controller.addElementType(
 		"top",
 		function (context) {
 			context.fillStyle = "#000";
-			context.fillRect(-350,-10,700,20);
+			context.fillRect(-350,-2,700,4);
 		},
 		// toDO:edgeresolution according to width/height
-		{width:700, height:20, edgeResolution:5});		
+		{width:700, height:2, edgeResolution:5});		
 
 	controller.addElementType(
 		"round",
@@ -40,14 +40,14 @@ CreCollision.onload = function ()
 			color1 =  "#AAF";
 			color2= "#DDD";
 
-			context.arc(0,0,50,0,2*Math.PI);
+			context.arc(0,0,7,0,2*Math.PI);
 			var gradient = context.createRadialGradient(0,0,50,50,-5,3);
 			gradient.addColorStop(0.0,color1);
 			gradient.addColorStop(1.0,color2);
 			context.fillStyle = gradient;
 			context.fill();
 		},
-		{width:100, height:100, edgeResolution:5}		
+		{width:20, height:20, edgeResolution:5}		
 	);
 	
 	controller.addElementType(
@@ -68,4 +68,6 @@ CreCollision.onload = function ()
 			},
 			{width:150, height:50, edgeResolution:5}		
 		);
+	
+	controller.emitToServer('clientReady');
 };

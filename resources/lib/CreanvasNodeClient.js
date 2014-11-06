@@ -213,13 +213,15 @@ if (TEST) {
       return null;
     }
     var edgeResolution = boxData["edgeResolution"] || 10;
+    var edgeResolutionX = Math.min(edgeResolution, width / 10);
+    var edgeResolutionY = Math.min(edgeResolution, height / 10);
     var tempCanvas = controller.context.canvas.ownerDocument.createElement("canvas");
     var temporaryRenderingContext = tempCanvas.getContext("2d");
-    tempCanvas.width = Math.ceil(width / edgeResolution);
-    tempCanvas.height = Math.ceil(height / edgeResolution);
+    tempCanvas.width = Math.ceil(width / edgeResolutionX);
+    tempCanvas.height = Math.ceil(height / edgeResolutionY);
     temporaryRenderingContext.beginPath();
-    temporaryRenderingContext.translate(-left / edgeResolution, -top / edgeResolution);
-    temporaryRenderingContext.scale(1 / edgeResolution, 1 / edgeResolution);
+    temporaryRenderingContext.translate(-left / edgeResolutionX, -top / edgeResolutionY);
+    temporaryRenderingContext.scale(1 / edgeResolutionX, 1 / edgeResolutionY);
     draw(temporaryRenderingContext);
     var edgeImage = temporaryRenderingContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
     var startEdge = null;
@@ -255,7 +257,7 @@ if (TEST) {
       if (!match) {
         return;
       }
-      edges.push({x:(x + dx) * edgeResolution + left, y:(y + dy) * edgeResolution + top, isCorner:isCorner});
+      edges.push({x:(x + dx) * edgeResolutionX + left, y:(y + dy) * edgeResolutionY + top, isCorner:isCorner});
       imageX = x;
       imageY = y;
       currentEdge = edge;

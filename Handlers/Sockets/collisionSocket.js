@@ -19,6 +19,10 @@ var startApplication = function(socketName) {
 		socket.on('disconnect', function(){
 			theStuff.disconnect();
 			console.log('user disconnected');});
+		
+		socket.on('clientReady', function(){
+			theStuff.start();
+		});
 
 	});
 };
@@ -27,7 +31,7 @@ var CollisionTest = function(collision, socket){
 	var game = this;
 	
 	// each user gets a new room
-	this.controller = new serverController.Controller(collision, socket.id)
+	this.controller = new serverController.Controller(collision, socket.id, false)
 	this.controller.addSocket(socket);	
 
 	this.controller.addElement
@@ -63,35 +67,77 @@ var CollisionTest = function(collision, socket){
 		["solid", {mass:Infinity}]
 	);
 		
-	this.controller.addElement
-	(
-		["name", "round1"],
-		["image", { "width":100,"height":100, "typeName": 'round'}],
-		["position", {"x": 200, "y": 100}],			
-		["solid", {mass:1}],
-		["clickable", {}],
-		["moving", {vx:200}]
-	);
-
-	this.controller.addElement
-	(
-		["name", "round2"],
-		["image", { "width":100,"height":100, "typeName": 'round'}],
-		["position", {"x": 500, "y": 250}],			
-		["solid", {mass:1}],
-		["moving", {vx:-200}]
-	);
 	
-	this.controller.addElement
-	(
-		["name", "round3"],
-		["image", { "width":100,"height":100, "typeName": 'round'}],
-		["position", {"x": 400, "y": 100}],			
-		["solid", {mass:1}],
-		["clickable", {}],
-		["moving", {vy:150}]
-	);
+	for (i=2;i<27;i++)
+	{
+		this.controller.addElement
+		(
+			["name", "round1"],
+			["image", { "width":20,"height":20, "typeName": 'round'}],
+			["position", {"x": 25*i, "y": 20}],			
+			["solid", {mass:1}],
+			["clickable", {}],
+			["moving", {vy:100}]
+		);
+		
+		this.controller.addElement
+		(
+			["name", "round1"],
+			["image", { "width":20,"height":20, "typeName": 'round'}],
+			["position", {"x": 25*i, "y": 470}],			
+			["solid", {mass:1}],
+			["clickable", {}],
+			["moving", {vy:-100}]
+		);
+	}
 
+	for (i=4;i<25;i++)
+	{
+		this.controller.addElement
+		(
+			["name", "round1"],
+			["image", { "width":20,"height":20, "typeName": 'round'}],
+			["position", {"x": 25*i+10, "y": 100}],			
+			["solid", {mass:1}],
+			["clickable", {}],
+			["moving", {vy:150}]
+		);
+		
+		this.controller.addElement
+		(
+			["name", "round1"],
+			["image", { "width":20,"height":20, "typeName": 'round'}],
+			["position", {"x": 25*i+10, "y": 350}],			
+			["solid", {mass:1}],
+			["clickable", {}],
+			["moving", {vy:-150}]
+		);
+	}
+
+	for (i=2;i<20;i++)
+	{
+		this.controller.addElement
+		(
+			["name", "round1"],
+			["image", { "width":20,"height":20, "typeName": 'round'}],
+			["position", {"x": 20, "y": 25*i}],			
+			["solid", {mass:1}],
+			["clickable", {}],
+			["moving", {vx:100}]
+		);
+
+		this.controller.addElement
+		(
+			["name", "round1"],
+			["image", { "width":20,"height":20, "typeName": 'round'}],
+			["position", {"x": 680, "y": 25*i}],			
+			["solid", {mass:1}],
+			["clickable", {}],
+			["moving", {vx:-100}]
+		);
+	}
+
+	/*
 	this.controller.addElement
 	(
 		["name", "round4"],
@@ -100,12 +146,17 @@ var CollisionTest = function(collision, socket){
 		["solid", {mass:5}],
 		["clickable", {}],
 		["moving", {vx:50,vy:50}]
-	);
+	);*/
 	
 	this.disconnect = function()
 	{
 		game.controller.stop();
 		console.log("Stop called, all sever timers stopped");
+	};
+	
+	this.start = function()
+	{
+		game.controller.resume();
 	};
 };
 
