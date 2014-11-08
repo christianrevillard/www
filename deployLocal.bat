@@ -44,4 +44,7 @@ cd ..
 cd tictactoe
 call ..\..\www\deployWebServerApp.bat
 cd ..
+cd pong
+call ..\..\www\deployWebServerApp.bat
+cd ..
 cd ..\www

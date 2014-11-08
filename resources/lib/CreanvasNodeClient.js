@@ -13,7 +13,7 @@ if (TEST) {
   creanvas.NodeJsController = function(controllerData) {
     var controller = this;
     controller.refreshTime = controllerData["controller.refreshTime"] || creanvas.NodeJsController.DEFAULT_REFRESH_TIME;
-    this.clientToServerBuffering = 50;
+    this.clientToServerBuffering = 20;
     var canvas = controllerData["canvas"];
     this.logger = controllerData["log"];
     this.lengthScale = controllerData["lengthScale"] || canvas.height / controllerData["realHeight"] || canvas.width / controllerData["realWidth"] || 1;
@@ -21,16 +21,10 @@ if (TEST) {
     this.elementTypes = [];
     var emitBuffer = [];
     this.emitToServer = function(action, actionData, overrideActionKey) {
-      if (overrideActionKey && emitBuffer.length > 0) {
-        var toOverride = emitBuffer.filter(function(e) {
-          return e.overrideActionKey == overrideActionKey;
+      if (overrideActionKey) {
+        emitBuffer = emitBuffer.filter(function(e) {
+          return e.overrideActionKey != overrideActionKey;
         });
-        if (toOverride.length > 0) {
-          toOverride.forEach(function(e) {
-            e.actionData = actionData;
-          });
-          return;
-        }
       }
       emitBuffer.push({action:action, actionData:actionData, overrideActionKey:overrideActionKey});
     };
