@@ -4,6 +4,11 @@ var applyTo = function(element, movableData)
 	var isBlocked =  movableData["isBlocked"];
 
 	element.omega = element.omega || 0;
+
+	element.xMin = movableData.xMin;
+	element.yMin = movableData.yMin;
+	element.xMax = movableData.xMax;
+	element.YMax = movableData.yMax;
 	
 	element.isMovable = true;
 
@@ -55,6 +60,12 @@ var applyTo = function(element, movableData)
 				return true;
 			};
 			
+			if ((element.xMax!==undefined && eventData.x>element.xMax) || 
+				(element.xMin!==undefined && eventData.x<element.xMin) || 
+				(element.yMax!==undefined && eventData.y>element.yMax) || 
+				(element.yMin!==undefined && eventData.y<element.yMin))
+				return;
+			
 			if (element.suspendMoving)
 			{
 				if (element.isPointInElementEdges(eventData.x, eventData.y))
@@ -91,11 +102,11 @@ var applyTo = function(element, movableData)
 			element.elementX = eventData.x; 
 			element.elementY = eventData.y;
 			
-			console.log("movable speed: " + JSON.stringify(element.movingSpeed ));
+//			console.log("movable speed: " + JSON.stringify(element.movingSpeed ));
 			
 			if (element.preMove && !element.preMove())
 			{	
-				console.log('Cannot move ' + element.id  + ' to (' + eventData.x +',' + eventData.y +')');
+//				console.log('Cannot move ' + element.id  + ' to (' + eventData.x +',' + eventData.y +')');
 				element.elementX = element.rollbackData.elementX; 
 				element.elementY = element.rollbackData.elementY;
 				element.elementAngle = element.rollbackData.elementAngle;
@@ -124,7 +135,7 @@ var applyTo = function(element, movableData)
 		this.movingSpeed = this.originalSpeed;
 		element.touchIdentifier = null;
 
-		console.log('StopMoving' + element.id  + ' at (' + element.elementX +',' + element.elementY +',' + element.elementZ +') ' + element.movingSpeed.x);
+//		console.log('StopMoving' + element.id  + ' at (' + element.elementX +',' + element.elementY +',' + element.elementZ +') ' + element.movingSpeed.x);
 		return false;
 	};
 

@@ -40,42 +40,23 @@ CrePong.onload = function ()
 			color1 =  "#AAF";
 			color2= "#DDD";
 
-			context.arc(0,0,7,0,2*Math.PI);
+			context.arc(0,0,15,0,2*Math.PI);
 			var gradient = context.createRadialGradient(0,0,50,50,-5,3);
 			gradient.addColorStop(0.0,color1);
 			gradient.addColorStop(1.0,color2);
 			context.fillStyle = gradient;
 			context.fill();
 		},
-		{width:20, height:20, edgeResolution:5}		
+		{width:30, height:30, edgeResolution:5}		
 	);
-	
-	controller.addElementType(
-			"redRound",
-			function (context) {
-				var color1, color2;
-				color1 =  "#F88";
-				color2= "#DDD";
-
-				context.scale(3,1);
-				context.arc(0,0,25,0,2*Math.PI);
-				var gradient = context.createRadialGradient(0,0,25,25,-5,3);
-				gradient.addColorStop(0.0,color1);
-				gradient.addColorStop(1.0,color2);
-				context.fillStyle = gradient;
-				context.fill();
-				context.scale(1/3,1);
-			},
-			{width:150, height:50, edgeResolution:5}		
-		);
-
+		
 	controller.addElementType(
 			"player",
 			function (context) {
 				context.fillStyle = "#F00";
-				context.fillRect(-10, -100, 20, 200);
+				context.fillRect(-5, -50, 10, 100);
 			},
-			{width:20, height:200, edgeResolution:5}		
+			{width:10, height:100, edgeResolution:5}		
 		);
 
 	

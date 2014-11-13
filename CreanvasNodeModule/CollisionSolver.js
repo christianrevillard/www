@@ -135,10 +135,12 @@ var CollisionSolver = function(controller) {
 		var previousEdge = undefined;
 
 		var collisionSegments = [];
-		var collisionPoints = elementEdges.edges.forEach(function(realEdge){
+		var collisionPoints = 0;
+		elementEdges.edges.forEach(function(realEdge){
 			var isIn = otherElement.isPointInElementEdges(realEdge.x, realEdge.y);
 			if (wasIn != undefined && wasIn != isIn)
 			{
+				collisionPoints++;
 				if(wasIn)
 				{	
 					collisionSegments.push({A:previousEdge, B:realEdge});
@@ -152,11 +154,13 @@ var CollisionSolver = function(controller) {
 			previousEdge = realEdge;
 		});
 		
+		
 		//close the loop;
 		var firstEdge = elementEdges.edges[0];
 		var firstIn = otherElement.isPointInElementEdges(firstEdge.x, firstEdge.y);
 		if (wasIn != firstIn)
 		{
+			collisionPoints++;
 			if(wasIn)
 			{	
 				collisionSegments.push({A:previousEdge, B:firstEdge});
@@ -166,7 +170,10 @@ var CollisionSolver = function(controller) {
 				collisionSegments.push({A:firstEdge, B:previousEdge});
 			}
 		}
-		
+
+//		if (collisionPoints<2)
+	//		return;
+
 		if (collisionSegments.length < 2)
 			return false;		
 		
@@ -186,8 +193,14 @@ var CollisionSolver = function(controller) {
 			}
 			return {x:(s.A.x+s.B.x)/2,y:(s.A.y+s.B.y)/2};
 			});
-		
+		console.log("Element: " + JSON.stringify({x:element.elementX.toFixed(2), y:element.elementY.toFixed(2)}));
+		console.log("OtherEl: " + JSON.stringify({x:otherElement.elementX.toFixed(2), y:otherElement.elementY.toFixed(2)}));
+		console.log("Collisi: " + JSON.stringify(collisionPoints));
+		console.log("ElBefore: " + JSON.stringify({vx:element.movingSpeed?element.movingSpeed.x.toFixed(2):0, vy:element.movingSpeed?element.movingSpeed.y.toFixed(2):0, o:element.omega?element.omega.toFixed(2):0}));		
+		console.log("OeBefore: " + JSON.stringify({vx:otherElement.movingSpeed?otherElement.movingSpeed.x.toFixed(2):0, vy:otherElement.movingSpeed?otherElement.movingSpeed.y.toFixed(2):0, o:otherElement.omega?otherElement.omega.toFixed(2):0}));
 		updateAfterCollision(element, otherElement, collisionPoints);
+		console.log("ElAfter: " + JSON.stringify({vx:element.movingSpeed?element.movingSpeed.x.toFixed(2):0, vy:element.movingSpeed?element.movingSpeed.y.toFixed(2):0, o:element.omega?element.omega.toFixed(2):0}));		
+		console.log("OeAfter: " + JSON.stringify({vx:otherElement.movingSpeed?otherElement.movingSpeed.x.toFixed(2):0, vy:otherElement.movingSpeed?otherElement.movingSpeed.y.toFixed(2):0, o:otherElement.omega?otherElement.omega.toFixed(2):0}));
 				
 		return true;
 	};
