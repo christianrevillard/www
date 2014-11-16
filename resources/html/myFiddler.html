@@ -5,13 +5,20 @@
 			content="text/html; charset=UTF-8" />
 
   			<script src="../js/myFiddler.js"></script>
+  			
+  			<script type="text/jscript">
+  				var doonload = function()
+  				{
+  					onload();
+  				}
+  			</script>
 	</head>
 	<body>
-		<input type="button" value="Start" onclick="javascript:onload();"/>
+		<input type="button" value="Start" onclick="javascript:doonload();"/>
 		<canvas 
 			id="theCanvas" 
-			width="600" 
-			height="600" 
+			width="50" 
+			height="50" 
 			style="border:1px solid black;"> 
 		</canvas>
 		<br/>

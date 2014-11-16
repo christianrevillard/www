@@ -1,139 +1,164 @@
+// find one path
 var onload = function ()
 {
 	var results = "<p>Nothing for the moment</p>";
 	var divResults = document.getElementById('divResults');
 	
 	var e1 = {
-		x:0,
-		y:0,
-		radius:250,		
 		"getInOut": function(x,y){
-			return this.getDistance(x,y) - this.radius; // <0 inside, >0 outside
-		},
-		"getDistance" : function(x,y)
-		{
-			return Math.sqrt((this.x-x)*(this.x-x) + (this.y-y)*(this.y-y));
+			var thisx=0;
+			var thisy=0;
+			var thisr=25;
+			
+			return Math.sqrt((thisx-x)*(thisx-x) + (thisy-y)*(thisy-y)) - thisr;
 		}
 	};
 
 	var e2 = {
-		x:0,
-		y:0,
 		"getInOut": function(x,y){
 			x = Math.abs(x);
 			y = Math.abs(y);
-			// rectangle -300,-100 to 300,100
-			// rectangle -200,-100 to 200,100
-			return ((x < 5*y)? y : x/5) - 100 ;
-		},
-		"getDistance" : function(x,y)
-		{
-			return Math.sqrt((this.x-x)*(this.x-x) + (this.y-y)*(this.y-y));
+			return ((x < 5*y)? y : x/5) - 10 ;
 		}
 	};
-
-	
-	var canvas = document.getElementById('theCanvas');
-	var context = canvas.getContext("2d");
-	
-	// finding the intersection - recursively
-
-	var toE = function(e,a) { return e.getInOut(a.x,a.y)}
-
-	var Collision = function(x,y,r)
-	{
-		this.x=x;
-		this.y=y;
-		this.r=r;
-		var el1 = toE(e1,this);
-		var el2 = toE(e2,this);
-		this.e = el1*el1 + el2*el2
-	};
-	
-	var collisions = [new Collision(0,0,150)];	
-
-	var finalCollision = [];
-
-	var addIfMissing = function(col, limit)
-	{
-		if (col.e >= limit)
-			return false; // not better than previous step
 		
-		if (collisions.some(function(el) {
-			return [(el.x - col.x)*(el.x - col.x)+(el.y - col.y)*(el.y - col.y)]<col.r*col.r/4 
-			&& el.e < col.e
-			&& el.r >= col.r; }))
-			return false; // got better covering this one already 
-
-		// remove not better
-		collisions = collisions.filter(function(el){ 
-			return [(el.x - col.x)*(el.x - col.x)+(el.y - col.y)*(el.y - col.y)]>=col.r*col.r/4  || el.r < col.r; });
+//		getIntersections(e1.getInOut, e2.getInOut);
 	
-		collisions.push(col);
-
-		return true;
-	};
-
-	while (collisions.length>0)// some(function(el) { return el.e > 1; }))
-	{
-		context.clearRect ( 0 , 0 , 600 , 600);
-		
-		context.beginPath();
-		context.arc(300, 300, 250, 0, Math.PI * 2);
-		context.strokeStyle="#000";
-		context.stroke();
-		context.beginPath();
-//		context.rect(300-300,300-100, 600, 200);
-		context.rect(300-500,300-100, 1000, 200);
-		context.stroke();
-
-		collisions.sort(function(a, b){return a.e-b.e});
-		
-		collisions.forEach(
-				function(col)
-				{
-					context.beginPath();
-					context.arc(300+col.x, 300+col.y, col.r, 0, Math.PI*2);
-					context.strokeStyle="#F00";
-					context.stroke();
-				});
-		
-		col = collisions.pop();
-
-		context.beginPath();
-		context.arc(300+col.x, 300+col.y, col.r, 0, Math.PI*2);
-		context.strokeStyle="#FF0";
-		context.stroke();
-
-		// moving around
-		addIfMissing(new Collision(col.x, col.y-col.r, col.r), col.e);
-		addIfMissing(new Collision(col.x-col.r, col.y, col.r), col.e);
-		addIfMissing(new Collision(col.x+col.r, col.y, col.r), col.e);
-		addIfMissing(new Collision(col.x, col.y+col.r, col.r), col.e);
-
-		// concentrate - only when we're not too far away
-		if(col.r>0.1)
-			addIfMissing(new Collision(col.x, col.y, col.r/2), 2*col.r*col.r)
-
-		if (col.e < 0.1)
-		{
-			finalCollision.push(col);
+	// much better than any algorithm... but need a double definition
+	// is this practical for complex stuff?
+	// => precision and speed... 
+	//for (var i=0; i<100; i++)
+	getParametricIntersections (
+		function(t) {
+			return {x:25*Math.cos(2*Math.PI*t) ,y:25*Math.sin(2*Math.PI*t)};
+		},	
+		function(p){
+			return p.x>-50 && p.x<50 && p.y>-10 && p.y<10;
 		}
-		
-		divResults.innerHTML = "<br/>" + JSON.stringify(collisions) + "<br/>"
+	);
 
+// use a full point stuff for complex figure? is it possible, feasible and actual???
+/// må testes...
+	
+	//for (var i=0; i<100; i++)
+		getParametricIntersections (
+			function(t) {
+				var p = 100 + 20 + 100 + 20;
+				var onP = t*p;
+				if (onP < 100)
+					return {x:-50 + onP, y:-10};
+				if (onP < 120)
+					return {x:50, y:-10 + onP - 100};
+				if (onP < 220)
+					return {x:50 - (onP - 120), y:10};
+				return {x:-50, y:10-(onP-220)};
+			},	
+			function(p){
+				return p.x*p.x + p.y*p.y < 25*25;
+			}
+		);
+
+};
+
+var IntersectionCandidate = function(x, y, searchRadius, border1, border2)
+{
+	this.x = x;
+	this.y = y;
+	this.searchRadius = searchRadius;
+	var o1 = border1(x,y);
+	var o2 = border2(x,y);
+	this.offset = o1*o1 + o2*o2
+};
+
+//where f=0,g=0 defining to curves
+
+var getIntersections = function(border1, border2){
+
+	// start point as parameter
+	var candidates = [new IntersectionCandidate(0, 0, 150, border1, border2)];	
+
+	var intersections = [];
+
+	var checkNewCandidate = function(candidate, maximumOffset)
+	{
+		if (candidate.offset >= maximumOffset)
+			return;
+		
+		if (candidates.some(
+				function(c) { 
+					return c.x  == candidate.x && c.y == candidate.y && c.searchRadius <= candidate.searchRadius; }))
+			return;
+
+		if (intersections.some(
+				function(i) {
+					return (i.x-candidate.x)*(i.x-candidate.x) + (i.y-candidate.y)*(i.y-candidate.y) < i.searchRadius*i.searchRadius; }))
+			return; // already found !
+
+		if (candidate.offset < 0.01)
+		{
+			intersections.push(candidate);
+			return;
+		}
+
+		candidates.push(candidate);
+	};
+
+	while (candidates.length>0)
+	{
+		candidates.sort(function(a, b){return a.searchRadius-b.searchRadius});
+		var current = candidates.pop();
+
+		checkNewCandidate(new IntersectionCandidate(current.x, current.y-current.searchRadius, current.searchRadius, border1, border2), current.offset);
+		checkNewCandidate(new IntersectionCandidate(current.x-current.searchRadius, current.y, current.searchRadius, border1, border2), current.offset);
+		checkNewCandidate(new IntersectionCandidate(current.x+current.searchRadius, current.y, current.searchRadius, border1, border2), current.offset);
+		checkNewCandidate(new IntersectionCandidate(current.x, current.y+current.searchRadius, current.searchRadius, border1, border2), current.offset);
+		checkNewCandidate(new IntersectionCandidate(current.x, current.y, current.searchRadius/2, border1, border2), 2*current.searchRadius*current.searchRadius)
+
+		divResults.innerHTML = "<br/>" + JSON.stringify(candidates) + "<br/>";
 	}
 
-	var stuff = finalCollision;//.filter(function(col){return col.e < 1;});
-	divResults.innerHTML += "<br/>" + JSON.stringify(stuff) + "<br/>";
+	divResults.innerHTML += "<br/>" + JSON.stringify(intersections) + "<br/>";
+};
 
-	finalCollision.forEach(
-			function(col)
-			{
-				context.beginPath();
-				context.arc(300+col.x, 300+col.y, 5, 0, Math.PI*2);
-				context.strokeStyle="#0FF";
-				context.stroke();
-			});
 
+
+// where border define on [0..1] interval... return point {x,y}
+// Need parametric border, isIn(x,y) return bool
+var getParametricIntersections = function(border1, inside2){
+
+	var intersections = [];
+	
+	var distance = function (p1, p2)
+	{
+		return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y));
+	};
+
+	var wasInside = inside2(border1(0));		
+	
+	var findZero = function (inside, outside)
+	{	
+		var middle = (inside + outside)/2;
+		var borderMiddle = border1(middle);
+
+		if (distance(border1(inside), border1(outside))<0.01)
+		{
+			return borderMiddle;
+		}
+		
+		var insideMiddle = inside2(borderMiddle);
+		
+		return findZero(insideMiddle?middle:inside, insideMiddle?outside:middle);
+	}
+	
+	for (var t=0.01; t<=1; t=t+0.01)
+	{
+		var isInside = inside2(border1(t));	
+		if (wasInside != isInside)
+		{
+			intersections.push(findZero(isInside?t:t-0.01, isInside?t-0.01:t));
+		}
+		wasInside = isInside;
+	}
+
+	divResults.innerHTML += "<br/>" + JSON.stringify(intersections) + "<br/>";
 };
