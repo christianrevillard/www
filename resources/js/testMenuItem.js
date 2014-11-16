@@ -8,13 +8,27 @@ var handleFlipMenuItems = function(){
 		var canvas = item.children('canvas')[0];
 		var ctx = canvas.getContext('2d');
 		ctx.clearRect(0,0,100,100);
-		ctx.translate(50, 0);
-		ctx.scale(Math.cos(angle), 1);
+		ctx.translate(50, 50);
+		ctx.rotate(-Math.PI/4);
+		ctx.scale(Math.cos(angle), 1/Math.sqrt(2) + (1-1/Math.sqrt(2))*Math.cos(angle));
+		ctx.rotate(Math.PI/4);
+		ctx.fillStyle = "rgba(255, 0, 0, 1)";
+		ctx.fillRect(-50,-50,100,100);
+		ctx.strokeStyle="#000";
 		ctx.beginPath();
-		ctx.rect(-50,0,100,100);
+		//ctx.rect(-50,-50,100,100);
 		ctx.stroke();
+		ctx.strokeStyle="rgba(0, 0, 255, 1)";
+		ctx.lineWidth=5;
+		ctx.beginPath();
+		ctx.moveTo(-50,-50);
+		ctx.lineTo(50,-50);
+		ctx.lineTo(50,50);
+		ctx.stroke();
+
 		ctx.fillStyle = "rgba(0, 0, 0, 1)";
-		ctx.fillText("FT " + item.attr("crv-text"),-40,50);			
+		ctx.fillText("flipping ! " + item.attr("crv-text"),-40,-60);			
+		ctx.fillText("FT " + item.attr("crv-text"),-40,0);			
 	    ctx.setTransform(1, 0, 0, 1, 0, 0);		
 	};
 	
@@ -23,13 +37,26 @@ var handleFlipMenuItems = function(){
 		var canvas = item.children('canvas')[0];
 		var ctx = canvas.getContext('2d');
 		ctx.clearRect(0,0,100,100);
-		ctx.translate(50, 0);
-		ctx.scale(Math.cos(Math.PI-angle), 1);
+		ctx.translate(50, 50);
+		ctx.rotate(-Math.PI/4);
+		ctx.scale(Math.cos(Math.PI-angle), 1/Math.sqrt(2) + (1-1/Math.sqrt(2))*Math.cos(Math.PI-angle));
+		ctx.rotate(Math.PI/4);
+		ctx.fillStyle = "rgba(0, 0, 255, 1)";
+		ctx.fillRect(-50,-50,100,100);
+		ctx.strokeStyle="#000";
 		ctx.beginPath();
-		ctx.rect(-50,0,100,100);
+	//	ctx.rect(-50,-50,100,100);
+		ctx.stroke();
+		ctx.strokeStyle="rgba(255, 0, 0, 1)";
+		ctx.lineWidth=5;
+		ctx.beginPath();
+		ctx.moveTo(-50,-50);
+		ctx.lineTo(50,-50);
+		ctx.lineTo(50,50);
 		ctx.stroke();
 		ctx.fillStyle = "rgba(0, 0, 0, 1)";
-		ctx.fillText("BK " + item.attr("crv-text"),-40,50);			
+		ctx.fillText("flipping ! " + item.attr("crv-text"),-40,-60);			
+		ctx.fillText("BK " + item.attr("crv-text"),-40,0);			
 	    ctx.setTransform(1, 0, 0, 1, 0, 0);				
 	};
 
@@ -49,7 +76,7 @@ var handleFlipMenuItems = function(){
 		{
 			setTimeout(
 				function(){rotate(item);},
-				20);
+				30);
 		}
 		else
 		{
