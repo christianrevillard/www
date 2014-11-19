@@ -17,6 +17,7 @@ handlers.push(["*.js", resourceFileHandler.getHandler(fileLocations,'text/javasc
 handlers.push(["*.css", resourceFileHandler.getHandler(fileLocations,'text/css')]);
 handlers.push(["*.png", resourceFileHandler.getHandler(fileLocations,'image/png')]);
 handlers.push(["*.gif", resourceFileHandler.getHandler(fileLocations,'image/gif')]);
+handlers.push(["*.jpg", resourceFileHandler.getHandler(fileLocations,'image/jpg')]);
 handlers.push(["*.html", resourceFileHandler.getHandler(fileLocations,'text/html')]);
 handlers.push(["*.htm", resourceFileHandler.getHandler(fileLocations,'text/html')]);
 handlers.push(["*.ogg", resourceFileHandler.getHandler(fileLocations,'audio/ogg')]);
