@@ -4,13 +4,13 @@ var handleFlipMenuItems = function(){
 
 	var drawFront = function(item, angle)
 	{
-
 		var canvas = item.children('canvas')[0];
 		var ctx = canvas.getContext('2d');
-		ctx.clearRect(0,0,100,100);
-		ctx.translate(50, 50);
+		ctx.clearRect(0,0,200,200);
+		ctx.translate(100, 100);
 		ctx.rotate(-Math.PI/4);
-		ctx.scale(Math.cos(angle), 1/1.6 + (1-1/1.6)*Math.cos(angle));
+		var zoom = 1.5 - Math.cos(angle)/2;
+		ctx.scale(Math.cos(angle)*zoom, zoom);
 		ctx.rotate(Math.PI/4);
 		
 		var img = item.children('.frontImg')[0];
@@ -56,11 +56,12 @@ var handleFlipMenuItems = function(){
 		
 		var canvas = item.children('canvas')[0];
 		var ctx = canvas.getContext('2d');
-		ctx.clearRect(0,0,100,100);
+		ctx.clearRect(0,0,200,200);
 		
-		ctx.translate(50, 50);
+		ctx.translate(100, 100);
 		ctx.rotate(-Math.PI/4);
-		ctx.scale(Math.cos(Math.PI-angle), 1/1.6 + (1-1/1.6)*Math.cos(Math.PI-angle));
+		var zoom = 1.5 + Math.cos(Math.PI-angle)/2
+		ctx.scale(Math.cos(Math.PI-angle)*zoom, zoom);
 		ctx.rotate(Math.PI/4);
 
 		var img = item.children('.backImg')[0];
@@ -111,6 +112,11 @@ var handleFlipMenuItems = function(){
 	var rotate = function(item){
 		var angle = parseFloat(item.attr("crv-angle") || 0);
 		var deltaAngle = item.attr("crv-deltaAngle");
+		if (!item.attr("original-zindex"))
+		{
+			item.attr("original-zindex", item.css('z-index'));
+			item.css('z-index', 1000);
+		}
 		angle+=parseFloat(deltaAngle);
 		item.attr("crv-angle", angle);
 		
@@ -124,6 +130,12 @@ var handleFlipMenuItems = function(){
 		else
 		{
 			item.removeAttr("crv-inProgress");
+
+			if (angle<=0)
+			{
+				item.css('z-index', item.attr("original-zindex"));
+				item.removeAttr("original-zindex");
+			}
 		}
 	};
 
@@ -138,22 +150,22 @@ var handleFlipMenuItems = function(){
 	$('.flipMenuItem').each(
 			function(){
 				var canvas = document.createElement( "canvas" );
-				canvas.width = 100;
-				canvas.height = 100;
+				canvas.width = 200;
+				canvas.height = 200;
 				$(this).append(canvas);
 
 				$(this).attr("crv-angle", Math.PI);				
-				flip($(this), -2*Math.PI/100);
+				flip($(this), -2*Math.PI/80);
 			});
 	
 	$( '.flipMenuItem').mouseover(
 			function(){
-				flip($(this), 2*Math.PI/100);
+				flip($(this), 2*Math.PI/50);
 			});
 
 	$( '.flipMenuItem').mouseout(
 			function(){
-				flip($(this), -2*Math.PI/100);
+				flip($(this), -2*Math.PI/50);
 			});
 
 };

@@ -3,6 +3,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<script src="/files/js/jquery-2.1.1.min.js"></script>
 		<script src="/files/js/testMenuItem.js"></script>
+		<script src="/files/js/crv-flipMenuItem.js"></script>
 	</head>
 	<body>
 		<table>	
@@ -22,24 +23,31 @@
 			<tr><td><a href="/collision">WebSocket collision</a></td></tr>
 			<tr><td><a href="/files/html/pongClient.html">Pong</a></td></tr>
 			<tr><td><a href="/files/html/myFiddler.html">myFiddler</a></td></tr>
-			<tr><td><a href="/files/html/myFiddler.html">
-				<div class="flipMenuItem" crv-text="fiddler">
-					<img class="frontImg" src="/files/img/Koala.jpg" width="100px" heigt="100px" style="display:none;"/>
-					<img class="backImg" src="/files/img/Desert.jpg" width="100px" heigt="100px" style="display:none;"/>
-				</div>
-			</a></td></tr>
-			<tr style="background-color: black;"><td><a href="/files/html/pongClient.html">
-				<div class="flipMenuItem" crv-text="pong">
-					<img class="frontImg" src="/files/img/Hydrangeas.jpg" width="100px" heigt="100px" style="display:none;"/>
-					<img class="backImg" src="/files/img/Jellyfish.jpg" width="100px" heigt="100px" style="display:none;"/>
-				</div>
-			</a></td></tr>
-			<tr style="background-color: green;"><td><a href="/files/html/chat.html.html">
-				<div class="flipMenuItem" crv-text="chat">
-					<img class="frontImg" src="/files/img/Lighthouse.jpg" width="100px" heigt="100px" style="display:none;"/>
-					<img class="backImg" src="/files/img/Penguins.jpg" width="100px" heigt="100px" style="display:none;"/>
-				</div>
-			</a></td></tr>
 		</table>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:10px;top:200px;"
+			frontImage='/files/img/Koala.jpg' 
+			backImage='/files/img/Desert.jpg'
+			href='/files/html/myFiddler.html'
+			text='FIDDLER'
+			></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:10px;top:300px;"
+			frontImage='/files/img/Hydrangeas.jpg' 
+			backImage='/files/img/Jellyfish.jpg'
+			href='/files/html/pongClient.html'
+			text='PONG'
+			></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:10px;top:400px;"
+			frontImage='/files/img/Lighthouse.jpg' 
+			backImage='/files/img/Penguins.jpg'
+			href='/files/html/chat.html'
+			text='CHAT'
+			></crv-flipmenuitem>
+
 	</body>
 </html>
