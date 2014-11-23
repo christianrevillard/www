@@ -53,6 +53,10 @@ var setImage = function(element, imageData) {
 
 	if (imageData["getEdges"])
 		element.getEdges = imageData["getEdges"];
+
+	element.experimentalIsPointInElement = imageData["experimentalIsPointInElement"];
+
+	element.experimentalGetEdgePoint = imageData["experimentalGetEdgePoint"];
 };
 
 var setPosition = function(element, position) {

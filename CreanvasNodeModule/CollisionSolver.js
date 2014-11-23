@@ -59,24 +59,26 @@ var CollisionSolver = function(controller) {
 				centerCollisionOther,
 				colVectors.v);	
 
-		speedElement = new vector.Vector(
-			element.movingSpeed?element.movingSpeed.x:0, 
-			element.movingSpeed?element.movingSpeed.y:0);
+		speedElement = element.movingElement ? new vector.Vector(
+			element.movingElement.movingSpeed?element.movingElement.movingSpeed.x:0, 
+			element.movingElement.movingSpeed?element.movingElement.movingSpeed.y:0)
+		: new vector.Vector(0,0);
 		
-		speedOther = new vector.Vector(
-			other.movingSpeed?other.movingSpeed.x:0, 
-			other.movingSpeed?other.movingSpeed.y:0);
+		speedOther = other.movingElement ? new vector.Vector(
+			other.movingElement.movingSpeed?other.movingElement.movingSpeed.x:0, 
+			other.movingElement.movingSpeed?other.movingElement.movingSpeed.y:0):
+				new vector.Vector(0,0);
 
-		if (element.elementScaleSpeed)
+		if (element.movingElement && element.movingElement.elementScaleSpeed)
 		{
-			speedElement.x += centerCollisionElement.x*element.elementScaleSpeed.x;
-			speedElement.y += centerCollisionElement.y*element.elementScaleSpeed.y;
+			speedElement.x += centerCollisionElement.x*element.movingElement.elementScaleSpeed.x;
+			speedElement.y += centerCollisionElement.y*element.movingElement.elementScaleSpeed.y;
 		};
 
-		if (other.elementScaleSpeed)
+		if (other.movingElement && other.movingElement.elementScaleSpeed)
 		{
-			speedOther.x += centerCollisionOther.x*other.elementScaleSpeed.x;
-			speedOther.y += centerCollisionOther.y*other.elementScaleSpeed.y;
+			speedOther.x += centerCollisionOther.x*other.movingElement.elementScaleSpeed.x;
+			speedOther.y += centerCollisionOther.y*other.movingElement.elementScaleSpeed.y;
 		};
 
 		localSpeedElement = speedElement.getCoordinates(colVectors);
@@ -91,24 +93,26 @@ var CollisionSolver = function(controller) {
 			(localSpeedOther.v - localSpeedElement.v + (other.omega || 0) * otherRot.z - (element.omega || 0) * elementRot.z)
 			/( 1/otherMass + 1/elementMass + otherRot.z*otherRot.z/otherMOI + elementRot.z*elementRot.z/elementMOI );
 
-		if (!element.movingSpeed)
+		// should not be needed... do it better
+/*		if (!element.movingSpeed)
 		{
 			element.movingSpeed = {x:0,y:0};
-		}
+		}*/
 
-		element.movingSpeed.x += F/elementMass*colVectors.v.x;
-		element.movingSpeed.y += F/elementMass*colVectors.v.y;
+		// require moving for collidable 
+		element.movingElement.movingSpeed.x += F/elementMass*colVectors.v.x;
+		element.movingElement.movingSpeed.y += F/elementMass*colVectors.v.y;
 		
-		if (!other.movingSpeed)
+/*		if (!other.movingSpeed)
 		{
 			other.movingSpeed = {x:0,y:0};
-		}
+		}*/
 
-		other.movingSpeed.x -= F/otherMass*colVectors.v.x;
-		other.movingSpeed.y -= F/otherMass*colVectors.v.y;
+		other.movingElement.movingSpeed.x -= F/otherMass*colVectors.v.x;
+		other.movingElement.movingSpeed.y -= F/otherMass*colVectors.v.y;
 		
-		element.omega = (element.omega || 0) + F * l1 / elementMOI;
-		other.omega = (other.omega || 0) - F * l2 / otherMOI;		
+		element.movingElement.omega += F * l1 / elementMOI;
+		other.movingElement.omega -= F * l2 / otherMOI;		
 	};
 
 	var hasCollided = function(element, otherElement)

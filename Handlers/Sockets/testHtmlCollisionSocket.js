@@ -39,8 +39,7 @@ var CollisionTest = function(collision, socket){
 		["name", "left"],
 		["image", { "width":20,"height":500, "typeName": 'wall'}],
 		["position", {"x": 10, "y": 250}],			
-		["solid", {mass:Infinity}],
-		["clickable", {}]
+		["solid", {mass:Infinity}]
 	);
 
 	this.controller.addElement
@@ -66,9 +65,8 @@ var CollisionTest = function(collision, socket){
 		["position", {"x": 350, "y": 490}],			
 		["solid", {mass:Infinity}]
 	);
-		
-	
-	for (i=10;i<15;i++)
+			
+	for (i=2;i<27;i++)
 	{
 		this.controller.addElement
 		(

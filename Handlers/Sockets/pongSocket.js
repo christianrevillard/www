@@ -77,7 +77,7 @@ var CollisionTest = function(collision, socket){
 			"isPointInElementEdges": function(x,y){
 					return this.getDistance(x,y)<15;
 			},
-			"getEdges": function(x,y){
+			"getEdges": function(){
 					if (this.customEdges)
 						return this.customEdges;
 					
@@ -91,8 +91,21 @@ var CollisionTest = function(collision, socket){
 					}
 
 					return this.edges = this.customEdges 
-		}
+			},
 
+		//<0 inside, >0 outside
+			"experimentalIsPointInElement": function(x,y){
+				// must use ElementCoordinates
+				return this.getDistance(x,y) - 15;
+			},
+		// [0..1] parametric definition of edges
+			// returned as ElementCoordinates
+
+			"experimentalGetEdgePoint": function(t){
+				return {
+					x:15*Math.sin(t*2*Math.PI),
+					y:15*Math.cos(t*2*Math.PI)};
+			}
 		}],
 		["position", {"x": 350, "y": 250}],			
 		["solid", {mass:1}],
@@ -106,13 +119,8 @@ var CollisionTest = function(collision, socket){
 		["image", { "width":20,"height":200, "typeName": 'player'}],
 		["position", {"x": 640, "y": 250}],			
 		["solid", {mass:Infinity, collisionCoefficient:1}],
-		["movable", {xMin:600, xMax:640}],
-		["moving", {}],
-		["customTimer", {time:50, action:
-			function(){
-			this.movingSpeed = this.movingSpeed || {x:0,y:0};
-			this.movingSpeed.x = 640 - this.elementX ;
-		}}]
+		["movable", {alwaysMoving:true}],
+		["moving", {xMin:500, xMax:640, alwaysMoving:true, vMax:300}]		
 	);
 	
 	
