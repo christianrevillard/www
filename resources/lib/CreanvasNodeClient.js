@@ -61,12 +61,12 @@ if (TEST) {
         });
         if (els.length > 0) {
           var el = els[0];
-          el.elementX = updated["elementX"] === undefined ? el.elementX : updated["elementX"];
-          el.elementY = updated["elementY"] === undefined ? el.elementY : updated["elementY"];
-          el.elementZ = updated["elementZ"] === undefined ? el.elementZ : updated["elementZ"];
-          el.elementScaleX = updated["elementScaleX"] === undefined ? el.elementScaleX : updated["elementScaleX"];
-          el.elementScaleY = updated["elementScaleY"] === undefined ? el.elementScaleY : updated["elementScaleY"];
-          el.elementAngle = updated["elementAngle"] === undefined ? el.elementAngle : updated["elementAngle"];
+          el.x = updated["x"] === undefined ? el.x : updated["x"];
+          el.y = updated["y"] === undefined ? el.y : updated["y"];
+          el.z = updated["z"] === undefined ? el.z : updated["z"];
+          el.scale.x = updated["scaleX"] === undefined ? el.scale.x : updated["scaleX"];
+          el.scale.y = updated["scaleY"] === undefined ? el.scale.y : updated["scaleY"];
+          el.angle = updated["angle"] === undefined ? el.angle : updated["angle"];
           if (updated["typeName"] && el.elementType.typeName != updated["typeName"]) {
             el.elementType = controller.elementTypes.filter(function(e) {
               return e.typeName == updated["typeName"];
@@ -74,11 +74,12 @@ if (TEST) {
           }
         } else {
           if (DEBUG) {
-            controller.logMessage("Adding element " + updated["typeName"] + " in (" + updated["elementX"] + "," + updated["elementY"] + "," + updated["elementZ"] + ")");
+            controller.logMessage("Adding element " + updated["typeName"] + " in (" + updated["x"] + "," + updated["y"] + "," + updated["z"] + ")");
           }
-          var element = controller.add(["name", updated["name"]], ["image", {"elementType":controller.elementTypes.filter(function(e) {
+          updated.elementType = controller.elementTypes.filter(function(e) {
             return e.typeName == updated["typeName"];
-          })[0]}], ["position", {"x":updated["elementX"], "y":updated["elementY"], "z":updated["elementZ"], "angle":updated["elementAngle"]}]);
+          })[0];
+          var element = controller.add(updated);
           element.id = updated.id;
         }
       });
@@ -104,10 +105,21 @@ if (TEST) {
       if (controller.needRedraw && !controller.isDrawing) {
         controller.isDrawing = true;
         controller.elements.sort(function(a, b) {
-          return(a.elementZ || 0) - (b.elementZ || 0);
+          return(a.z || 0) - (b.z || 0);
         }).forEach(function(element) {
           element.drawMyself();
         });
+        controller.context.lineStyle = "black";
+        controller.context.beginPath();
+        for (var i = 100;i < 700;i += 50) {
+          controller.context.moveTo(i, 0);
+          controller.context.lineTo(i, 500);
+        }
+        for (var i = 100;i < 500;i += 50) {
+          controller.context.moveTo(0, i);
+          controller.context.lineTo(700, i);
+        }
+        controller.context.stroke();
         if (controller.displayMessage) {
           controller.displayMessage(controller.context);
         }
@@ -129,7 +141,7 @@ if (TEST) {
       context.fillStyle = creanvas.NodeJsController.DEFAULT_BACKGROUND_COLOUR;
       context.fillRect(0, 0, controller.context.canvas.width / controller.lengthScale, controller.context.canvas.height / controller.lengthScale);
     };
-    var background = controller.add(["name", "background"], ["image", {"elementType":{draw:draw}}], ["position", {"x":0, "y":0, "z":-Infinity}]);
+    var background = controller.add({"name":"background", "elementType":{draw:draw}, "x":0, "y":0, "z":-Infinity});
     background.id = 0;
   };
   creanvas.NodeJsController.prototype.logMessage = function(logData) {
@@ -192,7 +204,7 @@ if (TEST) {
     corners.push({x:left, y:bottom});
     return corners;
   };
-  creanvas.NodeJsController.prototype.getEdges = function(draw, boxData) {
+  creanvas.NodeJsController.prototype.getImageData = function(draw, boxData) {
     var controller = this;
     var edges = [];
     var width = boxData["width"];
@@ -206,143 +218,35 @@ if (TEST) {
     if (width == 0 || height == 0) {
       return null;
     }
-    var edgeResolution = boxData["edgeResolution"] || 10;
-    var edgeResolutionX = Math.min(edgeResolution, width / 10);
-    var edgeResolutionY = Math.min(edgeResolution, height / 10);
     var tempCanvas = controller.context.canvas.ownerDocument.createElement("canvas");
     var temporaryRenderingContext = tempCanvas.getContext("2d");
-    tempCanvas.width = Math.ceil(width / edgeResolutionX);
-    tempCanvas.height = Math.ceil(height / edgeResolutionY);
+    tempCanvas.width = width;
+    tempCanvas.height = height;
     temporaryRenderingContext.beginPath();
-    temporaryRenderingContext.translate(-left / edgeResolutionX, -top / edgeResolutionY);
-    temporaryRenderingContext.scale(1 / edgeResolutionX, 1 / edgeResolutionY);
+    temporaryRenderingContext.translate(-left, -top);
     draw(temporaryRenderingContext);
-    var edgeImage = temporaryRenderingContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-    var startEdge = null;
-    var transparencyLimit = 1;
-    var imageX = null;
-    var imageY = null;
-    var currentEdge = null;
-    var checkPoint = function(x, y, edge, isCorner) {
-      if (edgeImage.data[y * tempCanvas.width * 4 + x * 4 + 3] < transparencyLimit) {
-        return false;
-      }
-      var match = false;
-      if (edge == "top") {
-        match = y == 0 || edgeImage.data[(y - 1) * tempCanvas.width * 4 + x * 4 + 3] < transparencyLimit;
-        dx = .5;
-        dy = 0;
-      }
-      if (edge == "left") {
-        match = x == 0 || edgeImage.data[y * tempCanvas.width * 4 + (x - 1) * 4 + 3] < transparencyLimit;
-        dx = 0;
-        dy = .5;
-      }
-      if (edge == "right") {
-        match = x == tempCanvas.width - 1 || edgeImage.data[y * tempCanvas.width * 4 + (x + 1) * 4 + 3] < transparencyLimit;
-        dx = 1;
-        dy = .5;
-      }
-      if (edge == "bottom") {
-        match = y == tempCanvas.height - 1 || edgeImage.data[(y + 1) * tempCanvas.width * 4 + x * 4 + 3] < transparencyLimit;
-        dx = .5;
-        dy = 1;
-      }
-      if (!match) {
-        return;
-      }
-      edges.push({x:(x + dx) * edgeResolutionX + left, y:(y + dy) * edgeResolutionY + top, isCorner:isCorner});
-      imageX = x;
-      imageY = y;
-      currentEdge = edge;
-      return true;
-    };
-    for (var forX = 0;forX < tempCanvas.width;forX++) {
-      for (var forY = 0;forY < tempCanvas.height;forY++) {
-        if (checkPoint(forX, forY, "top", true)) {
-          startEdge = {x:imageX, y:imageY};
-          forX = tempCanvas.width;
-          forY = tempCanvas.height;
-        }
-      }
-    }
-    if (startEdge) {
-      do {
-        if (currentEdge == "top") {
-          if (imageX < tempCanvas.width - 1 && imageY > 0 && checkPoint(imageX + 1, imageY - 1, "left", true)) {
-            continue;
-          }
-          if (imageX < tempCanvas.width - 1 && checkPoint(imageX + 1, imageY, "top", false)) {
-            continue;
-          }
-          if (checkPoint(imageX, imageY, "right", true)) {
-            continue;
-          }
-        } else {
-          if (currentEdge == "right") {
-            if (imageX < tempCanvas.width - 1 && imageY < tempCanvas.height - 1 && checkPoint(imageX + 1, imageY + 1, "top", true)) {
-              continue;
-            }
-            if (imageY < tempCanvas.height - 1 && checkPoint(imageX, imageY + 1, "right", false)) {
-              continue;
-            }
-            if (checkPoint(imageX, imageY, "bottom", true)) {
-              continue;
-            }
-          } else {
-            if (currentEdge == "bottom") {
-              if (imageX > 0 && imageY < tempCanvas.height - 1 && checkPoint(imageX - 1, imageY + 1, "right", true)) {
-                continue;
-              }
-              if (imageX > 0 && checkPoint(imageX - 1, imageY, "bottom", false)) {
-                continue;
-              }
-              if (checkPoint(imageX, imageY, "left", true)) {
-                continue;
-              }
-            } else {
-              if (currentEdge == "left") {
-                if (imageX > 0 && imageY > 0 && checkPoint(imageX - 1, imageY - 1, "bottom", true)) {
-                  continue;
-                }
-                if (imageY > 0 && checkPoint(imageX, imageY - 1, "left", false)) {
-                  continue;
-                }
-                if (checkPoint(imageX, imageY, "top", true)) {
-                  continue;
-                }
-              }
-            }
-          }
-        }
-      } while (imageX != startEdge.x || imageY != startEdge.y);
-    }
-    return edges;
+    boxData["top"] = top;
+    boxData["left"] = left;
+    boxData["bottom"] = bottom;
+    boxData["right"] = right;
+    boxData["width"] = width;
+    boxData["height"] = height;
+    return{data:temporaryRenderingContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data, "width":tempCanvas.width, "height":tempCanvas.height};
   };
   creanvas.NodeJsController.prototype.isPointInPath = function(x, y) {
     return this.context.isPointInPath(x * this.lengthScale, y * this.lengthScale);
   };
   creanvas.NodeJsController.prototype.addElementType = function(typeName, draw, boxData) {
-    var edges = boxData == null ? null : this.getEdges(draw, boxData);
-    this.elementTypes.push({typeName:typeName, draw:draw, edges:edges});
-    this.emitToServer("registerEdges", {"typeName":typeName, "edges":edges});
+    var imageData = boxData == null ? null : this.getImageData(draw, boxData);
+    this.elementTypes.push({typeName:typeName, draw:draw});
   };
-  creanvas.NodeJsController.prototype.add = function() {
+  creanvas.NodeJsController.prototype.add = function(elementTemplate) {
     var controller = this;
     if (DEBUG) {
       controller.logMessage("Controller.addElement: Adding element - args:" + arguments.length);
     }
     var args = [].slice.call(arguments);
-    var identificationData = args.filter(function(arg) {
-      return arg && arg[0] == "name";
-    })[0] || ["name", "Unknown"];
-    var imageData = args.filter(function(arg) {
-      return arg && arg[0] == "image";
-    })[0];
-    var positionData = args.filter(function(arg) {
-      return arg && arg[0] == "position";
-    })[0];
-    var element = new CreJs.CreanvasNodeClient.NodeJsElement(controller, identificationData, imageData, positionData);
+    var element = new CreJs.CreanvasNodeClient.NodeJsElement(controller, elementTemplate);
     controller.elements.push(element);
     return element;
   };
@@ -354,37 +258,27 @@ if (TEST) {
 })();
 (function() {
   var creanvas = CreJs.CreanvasNodeClient;
-  creanvas.NodeJsElement = function(controller, identificationData, imageData, positionData) {
+  creanvas.NodeJsElement = function(controller, elementTemplate) {
     var element = this;
     this.controller = controller;
-    setIdentification(element, identificationData[1]);
-    setImage(element, imageData[1]);
-    setPosition(element, positionData[1]);
-    this.drawMyself = function() {
-      var element = this;
-      element.controller.context.translate(element.elementX, element.elementY);
-      element.controller.context.rotate(element.elementAngle || 0);
-      element.controller.context.scale(element.elementScaleX || 1, element.elementScaleY || 1);
-      controller.context.beginPath();
-      element.elementType.draw(controller.context);
-      element.controller.context.scale(1 / (element.elementScaleX || 1), 1 / (element.elementScaleY || 1));
-      element.controller.context.rotate(-(element.elementAngle || 0));
-      element.controller.context.translate(-element.elementX, -element.elementY);
-    };
+    element.name = elementTemplate.name;
+    element.scale = {x:elementTemplate["scaleX"] || 1, y:elementTemplate["scaleY"] || 1};
+    element.elementType = elementTemplate["elementType"];
+    element.x = elementTemplate["x"] || 0;
+    element.y = elementTemplate["y"] || 0;
+    element.z = elementTemplate["z"] || 0;
+    element.angle = elementTemplate["angle"] || 0;
   };
-  var setIdentification = function(element, identificationData) {
-    element.elementName = identificationData;
-  };
-  var setImage = function(element, imageData) {
-    element.elementScaleX = imageData["scaleX"] || 1;
-    element.elementScaleY = imageData["scaleY"] || 1;
-    element.elementType = imageData["elementType"];
-  };
-  var setPosition = function(element, position) {
-    element.elementX = position["x"] || 0;
-    element.elementY = position["y"] || 0;
-    element.elementZ = position["z"] || 0;
-    element.elementAngle = position["angle"] || 0;
+  creanvas.NodeJsElement.prototype.drawMyself = function() {
+    var element = this;
+    element.controller.context.translate(element.x, element.y);
+    element.controller.context.rotate(element.angle || 0);
+    element.controller.context.scale(element.scale.x || 1, element.scale.y || 1);
+    element.controller.context.beginPath();
+    element.elementType.draw(element.controller.context);
+    element.controller.context.fillStyle = "black";
+    element.controller.context.fillText("[" + element.id + "]", -20, 0);
+    element.controller.context.setTransform(1, 0, 0, 1, 0, 0);
   };
 })();
 

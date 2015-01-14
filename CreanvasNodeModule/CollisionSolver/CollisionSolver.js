@@ -1,4 +1,5 @@
-var vector = require('./Vector');
+var vector = require('../Vector');
+var collisionFactory = require('./CollisionFactory');
 
 var round = function(x){
 	return Math.round(10000*x)/10000;
@@ -7,6 +8,7 @@ var round = function(x){
 var CollisionSolver = function(controller) {				
 	this.controller = controller;
 	this.broadTilesWidth = 30; // client/configuration data
+	this.collisionFactory = new collisionFactory.CollisionFactory();
 };
 
 /** 
@@ -70,11 +72,13 @@ CollisionSolver.prototype.processBroadPhase = function(collisionsToCheck, elemen
 				e2.collisions = e2.collisions || [];
 				e1.collisions[e2.id] = { collisionWith: e2 };
 				e2.collisions[e1.id] = { collisionWith: e1 };
-				
+
 				collisionsToCheck.push({
 					e1:e1,
 					e2:e2,  //e2.id>e1.id, always
-					status:undefined});
+					status:undefined,
+					collisionHandler: collisionSolver.collisionFactory.getCollisionHandler(e1, e2)
+				});
 			});
 		});
 	});
@@ -100,7 +104,7 @@ CollisionSolver.prototype.processNarrowPhase = function(collisionsToCheck, eleme
 				return;
 			if (!c.status)
 				return;
-			collisions.push({e1:e, e2:c.collisionWith, collisionPoints:c.collisionPoints});
+			collisions.push({e1:e, e2:c.collisionWith, collisionPoint:c.collisionPoint});
 		});
 		e.collisions = null;
 	});
@@ -116,9 +120,8 @@ CollisionSolver.prototype.checkForCollision = function(c, collisionsToCheck){
 	
 	if (!c.e1.moving.dt  && !c.e2.moving.dt)
 		return;
-
 					
-	var collision = this.getCollision(c.e1,c.e2); // must send speed too... try with the currrent one.
+	var collision = c.collisionHandler.getCollision(c.e1, c.e2); // must send speed too... try with the currrent one.
 				
 	if (!collision.collided)
 	{
@@ -129,9 +132,9 @@ CollisionSolver.prototype.checkForCollision = function(c, collisionsToCheck){
 	}
 
 	c.e1.collisions[c.e2.id].status = c.e2.collisions[c.e1.id].status = true;
-	c.e1.collisions[c.e2.id].collisionPoints = c.e2.collisions[c.e1.id].collisionPoints = collision.collisionPoints;
+	c.e1.collisions[c.e2.id].collisionPoint = c.e2.collisions[c.e1.id].collisionPoint = collision.collisionPoint;
 
-	this.moveOutOfOverlap(c.e1, c.e2);
+	this.moveOutOfOverlap(c.collisionHandler, c.e1, c.e2);
 
 	c.e1.collisions[c.e2.id].checkedDt = c.e1.moving.dt;
 	c.e2.collisions[c.e1.id].checkedDt = c.e2.moving.dt;
@@ -140,52 +143,7 @@ CollisionSolver.prototype.checkForCollision = function(c, collisionsToCheck){
 	this.requeuePossibleCollisions(collisionsToCheck, c.e2);		
 };
 
-CollisionSolver.prototype.getCollision = function(element, otherElement) {
-//	var start = new Date().getTime();
-	/*
-	 * nee to use new-old version
-	var realBox = element.getRealBox();
-	var otherRealBox = otherElement.getRealBox();
-	
-	// broad stuff 
-	if (realBox.right < otherRealBox.left)
-		return { collided: false};
-
-	if (otherRealBox.right < realBox.left)
-		return { collided: false};
-
-	if (realBox.bottom < otherRealBox.top)
-		return { collided: false};
-
-	if (otherRealBox.bottom < realBox.top)
-		return { collided: false};
-*/
-	var collisionPoints = [];
-
-	if ((element.position.x-otherElement.position.x)*(element.position.x-otherElement.position.x)+(element.position.y-otherElement.position.y)*(element.position.y-otherElement.position.y)<20*20)
-	{
-		var col = { x:(otherElement.position.x+element.position.x)/2,
-					y:(otherElement.position.y+element.position.y)/2};
-		collisionPoints.push({x:col.x-5, y:col.y});
-		collisionPoints.push({x:col.x+5, y:col.y});
-	}
-		
-		
-	if (collisionPoints.length < 2)
-	{
-		//console.log("No collision. Time: " + (new Date().getTime()-start));
-		return { collided: false};
-	}
-	
-	//console.log("Collision. Total time find+update: " + (new Date().getTime()-start));
-
-	return {
-		collided: true,
-		collisionPoints:collisionPoints
-	};
-};
-
-CollisionSolver.prototype.moveOutOfOverlap = function(e1, e2) {
+CollisionSolver.prototype.moveOutOfOverlap = function(collisionHandler,e1, e2) {
 	var steps = 1;
 
 	// no justification - testing.
@@ -202,7 +160,7 @@ CollisionSolver.prototype.moveOutOfOverlap = function(e1, e2) {
 	// scenario 1: same currentDt 
 	if (Math.abs(e1.moving.dt - e2.moving.dt)<0.0001)
 	{
-		this.moveOutOfOverlapCommonDt(e1, e2);
+		this.moveOutOfOverlapCommonDt(collisionHandler, e1, e2);
 	}
 	else
 	{
@@ -214,21 +172,21 @@ CollisionSolver.prototype.moveOutOfOverlap = function(e1, e2) {
 
 		highestDtElement.moving.updatePosition(lowestDt);
 						
-		collision = this.getCollision(highestDtElement,lowestDtElement);
+		collision = collisionHandler.getCollision(highestDtElement,lowestDtElement);
 		
 		if (collision.collided) {
 			// scenario 2a: different currentDt, do collide at minimum of the 2 => common dt to fin between 0 and lowestDt
 			// both moved at lowestDt already
-			this.moveOutOfOverlapCommonDt(e1, e2);				
+			this.moveOutOfOverlapCommonDt(collisionHandler, e1, e2);				
 		} else {
 			// scenario 2b: different currentDt, do no collide at minimum of the 2. => only update highest dt to find non-collision				
 			highestDtElement.moving.updatePosition(highestDt);
-			this.moveOutOfOverlapDifferentDt(highestDtElement, lowestDtElement);				
+			this.moveOutOfOverlapDifferentDt(collisionHandler, highestDtElement, lowestDtElement);				
 		}
 	}
 };
 
-CollisionSolver.prototype.moveOutOfOverlapCommonDt = function(e1, e2) {
+CollisionSolver.prototype.moveOutOfOverlapCommonDt = function(collisionHandler, e1, e2) {
 	var steps=1;
 	// Input: e1 and e2 overlap in their currentDt, which is the same
 	// Out: update currentDt and moving into an non-overlaping position.
@@ -250,7 +208,7 @@ CollisionSolver.prototype.moveOutOfOverlapCommonDt = function(e1, e2) {
 		e1.moving.updatePosition(testDt);
 		e2.moving.updatePosition(testDt);
 						
-		collision = this.getCollision(e1,e2);
+		collision = collisionHandler.getCollision(e1,e2);
 		
 		if (collision.collided) { 
 			collidedDt = testDt; 
@@ -263,7 +221,7 @@ CollisionSolver.prototype.moveOutOfOverlapCommonDt = function(e1, e2) {
 	e2.moving.updatePosition(okDt);
 };
 
-CollisionSolver.prototype.moveOutOfOverlapDifferentDt = function(toUpdate, fixed) {
+CollisionSolver.prototype.moveOutOfOverlapDifferentDt = function(collisionHandler, toUpdate, fixed) {
 	// Input: e1 and e2 overlap in their currentDt, but not at fixed.dt. Find the correct value for toUpdate
 	var steps = 1;
 	var okDt = fixed.moving.dt;	
@@ -281,7 +239,7 @@ CollisionSolver.prototype.moveOutOfOverlapDifferentDt = function(toUpdate, fixed
 		
 		toUpdate.moving.updatePosition(testDt);
 						
-		collision = this.getCollision(toUpdate,fixed);
+		collision = collisionHandler.getCollision(toUpdate,fixed);
 		
 		if (collision.collided) { collidedDt = testDt; } else { okDt = testDt;}		
 	}
@@ -289,6 +247,7 @@ CollisionSolver.prototype.moveOutOfOverlapDifferentDt = function(toUpdate, fixed
 	toUpdate.moving.updatePosition(okDt);
 };
 
+/*
 CollisionSolver.prototype.getCollisionPoint = function(edges)
 {		
 	var d,dmax = 0;
@@ -316,9 +275,9 @@ CollisionSolver.prototype.getCollisionPoint = function(edges)
 		x:(point1.x + point2.x)/2, 
 		y:(point1.y + point2.y)/2, 
 		vectors: vector.getUnitVectors(point1.x, point1.y,  point2.x , point2.y)};			
-};
+};*/
 
-CollisionSolver.prototype.getCollisionDetails = function (element, other, collisionPoints)
+CollisionSolver.prototype.getCollisionDetails = function (element, other, collisionPoint)
 {
 	if (element.solid.mass == Infinity && other.solid.mass == Infinity)
 	{
@@ -329,11 +288,12 @@ CollisionSolver.prototype.getCollisionDetails = function (element, other, collis
 		colVectors, speedElement, speedOther, localSpeedElement, localSpeedOther, centerCollisionElement,l1,
 		centerCollisionOther,l2;
 	
-	var collisionPoint = this.getCollisionPoint(collisionPoints);
+//	var collisionPoint = this.getCollisionPoint(collisionPoint);
 
 	//console.log("collisionPoint summary : " + collisionPoint.x + "," + collisionPoint.y);
 
-	colVectors = collisionPoint.vectors;
+	colVectors = element.getCollisionVectors(collisionPoint);
+		//collisionPoint.vectors;
 		
 	centerCollisionElement = new vector.Vector(collisionPoint.x-element.position.x, collisionPoint.y-element.position.y);								
 	l1 = vector.vectorProduct(centerCollisionElement, colVectors.v).z;		
@@ -384,6 +344,19 @@ CollisionSolver.prototype.getCollisionDetails = function (element, other, collis
 				+ other.moving.speed.angle * otherRot.z 
 				- element.moving.speed.angle * elementRot.z)
 		/( 1/otherMass + 1/elementMass + otherRot.z*otherRot.z/otherMOI + elementRot.z*elementRot.z/elementMOI );
+	
+	/*
+	console.log('F1: ' + element.solid.collisionCoefficient);
+	console.log('F2: ' + localSpeedOther.v);
+	console.log('F3: ' + localSpeedElement.v); 
+	console.log('F4: ' + other.moving.speed.angle);
+	console.log('F5: ' + otherRot.z );
+	console.log('F6: ' + element.moving.speed.angle);
+	console.log('F7: ' + elementRot.z);
+	console.log('F8: ' + otherMass);
+	console.log('F9: ' + elementMass);
+	console.log('F0: ' + otherMOI );
+	console.log('F1: ' + elementMOI );*/
 
 	return {
 		e1:{
@@ -399,6 +372,8 @@ CollisionSolver.prototype.getCollisionDetails = function (element, other, collis
 
 CollisionSolver.prototype.requeuePossibleCollisions = function(collisionsToCheck, e)
 {				
+	var collisionSolver = this;
+
 	e
 	.collisions
 	.filter(function(c){ return c.status !== undefined && c.checkedDt>e.moving.dt; }) //&& c.collisionWith.moving.dt>0
@@ -406,9 +381,10 @@ CollisionSolver.prototype.requeuePossibleCollisions = function(collisionsToCheck
 			c.status = c.collisionWith.collisions[e.id].status = undefined;
 
 			collisionsToCheck.push({
-				e1:e,
-				e2:c.collisionWith,
-				status:undefined});
+				e1: e,
+				e2: c.collisionWith,
+				status: undefined,
+				collisionHandler: collisionSolver.collisionFactory.getCollisionHandler(e, c.collisionWith)});
 		});
 };
 
@@ -417,8 +393,13 @@ CollisionSolver.prototype.updateSpeeds = function(collisionList){
 	
 	collisionList.forEach(function(c){
 		
-		c.collisionDetails = collisionSolver.getCollisionDetails(c.e1, c.e2, c.collisionPoints);
-			
+		c.collisionDetails = collisionSolver.getCollisionDetails(
+				c.e1, 
+				c.e2, 
+				// IN PROGRESS
+				c.collisionPoint);
+
+		// todo - not dy here !!!
 		if (Math.abs(c.collisionDetails.e1.dSpeedY)>0)
 		{
 			c.e1.moving.speed.x += c.collisionDetails.e1.dSpeedX;

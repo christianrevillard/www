@@ -1,37 +1,40 @@
-var collisionSolver = require('../CollisionSolver');
+var collisionSolver = require('../CollisionSolver/CollisionSolver'); // does not work, why??
 var moving = require("./Moving");
 
-var applyTo = function(element, solidData) {
-	var controller = element.controller;
-	
-	element.isSolid = true;
-	
-	element.mass = solidData.mass || Infinity;
-	element.collisionCoefficient = solidData.collisionCoefficient || 1;
+var SolidElement = function(parent, solidData) {
+	this.parent = parent;
+	this.mass = solidData.mass === 0 ? 0 : solidData.mass || Infinity;
+	this.collisionCoefficient = solidData.collisionCoefficient === 0 ? 0 : solidData.collisionCoefficient || 1;
+	this.isInside = solidData.isInside;
+};
 
+SolidElement.prototype.preMove = function() {		
+	if (this.parent.duplicable)
+		return true;		
+
+	return this.parent.controller.collisionSolver.solveCollision(this.parent);		
+};
+
+SolidElement.prototype.getMomentOfInertia = function()
+{			
+	var element = this.parent;
+
+	return this.mass / 12 * 
+		(element.box.width*element.scale.x * element.box.width*element.scale.x + 
+		element.box.height*element.scale.y * element.box.height*element.scale.y); // square...};
+};
+
+var applyTo = function(element, solidData) {
 	console.log('Applying solid');
-	
+
+	var controller = element.controller;
+
 	controller.collisionSolver = controller.collisionSolver || new collisionSolver.CollisionSolver(controller);
 	
-	if (!element.movingElement)
+	element.solid = new SolidElement(element, solidData);
+			
+	if (!element.moving)
 		moving.applyTo(element, {});
-
-	// TODO: can other type than Solid implement a Premove: change stuff here...
-	element.preMove = function()
-	{		
-		if (this.isDuplicable)
-			return true;		
-
-		if (!this.isSolid)
-			return true;		
-
-		return controller.collisionSolver.solveCollision(this);		
-	};
-	
-	element.getMomentOfInertia = function()
-	{				
-		return element.mass / 12 * (element.elementWidth*element.elementScaleX * element.elementWidth*element.elementScaleX + element.elementHeight*element.elementScaleY * element.elementHeight*element.elementScaleY); // square...};
-	};
 };
 
 exports.applyTo = applyTo;

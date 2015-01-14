@@ -1,147 +1,113 @@
 var decorators = require("./Decorators");
+var elementTypes = require("./ElementTypes");
+var vector = require('./Vector');
 
-var Element = function(controller, identificationData, imageData, positionData) {
+var Element = function(controller, elementTemplate) {
+	this.initialize(controller, elementTemplate);
+};
 
+Element.prototype.initialize = function(controller, elementTemplate) {
 	var element = this;
 
 	element.id = controller.elements.length + 1; 
 
 	this.controller = controller;
-	this.cachedValues = [];
-	this.clonerData = [];
-	// this.elementEvents = this.elementEvents || new
-	// CreJs.Creevents.EventContainer();
 
-	setIdentification(element, identificationData[1]);
-	setImage(element, imageData[1]);
-	setPosition(element, positionData[1]);
-
-	this.clonerData.push(identificationData);
-	this.clonerData.push(imageData);
-	this.clonerData.push(positionData);
+	setIdentification(element, elementTemplate);
+	setImage(element, elementTemplate);
+	setPosition(element, elementTemplate);
 
 	this.events = [];
-	// element.controller.elementEvents.getEvent('deactivate').addListener(function(e)
-	// { element.deactivate(); });
-};
-
-var setIdentification = function(element, identificationData) {
-	element.elementName = identificationData;
-};
-
-var setImage = function(element, imageData) {
-	var width = imageData["width"];
-	var height = imageData["height"];
-
-	element.top = imageData["top"] == 0 ? 0 : imageData["top"] || (-height / 2);
-	element.left = imageData["left"] == 0 ? 0 : imageData["left"]
-			|| (-width / 2);
-	element.bottom = imageData["bottom"] == 0 ? 0 : imageData["bottom"]
-			|| (element.top + height);
-	element.right = imageData["right"] == 0 ? 0 : imageData["right"]
-			|| (element.left + width);
-	element.elementWidth = width || (element.right - element.left);
-	element.elementHeight = height || (element.bottom - element.top);
-
-	// scaling decorator ?? => should be
-	element.elementScaleX = imageData["scaleX"] || 1;
-	element.elementScaleY = imageData["scaleY"] || 1;
-	element.typeName = imageData["typeName"];
 	
-	if (imageData["isPointInElementEdges"])
-		element.isPointInElementEdges = imageData["isPointInElementEdges"];
-
-	if (imageData["getEdges"])
-		element.getEdges = imageData["getEdges"];
-
-	element.experimentalIsPointInElement = imageData["experimentalIsPointInElement"];
-
-	element.experimentalGetEdgePoint = imageData["experimentalGetEdgePoint"];
+	var keys = Object.keys(elementTemplate);
+	for (var decorator in keys) {
+		//console.log ('checking ' + keys[decorator]);
+		if (decorators[keys[decorator]]) {			
+			//console.log ('applying ' + keys[decorator]);
+			element.applyElementDecorator(keys[decorator], elementTemplate[keys[decorator]]);
+		}
+		// make this to a more basic stuff, or is this ok??
+	/*	if (elementTypes[keys[decorator]]) {			
+			//console.log ('applying ' + keys[decorator]);
+			element.applyElementType(keys[decorator], elementTemplate[keys[decorator]]);
+		}*/
+	}
 };
 
-var setPosition = function(element, position) {
+var setIdentification = function(element, elementTemplate) {
+	element.name = elementTemplate.name;
+};
+
+var setImage = function(element, elementTemplate) {	
+	element.clientType = elementTemplate.clientType;
+};
+
+var setPosition = function(element, elementTemplate) {
 	// position prop
-	element.elementX = position["x"] || 0;
-	element.elementY = position["y"] || 0;
-	element.elementZ = position["z"] || 0;
-	element.elementAngle = position["angle"] || 0;
-};
-
-Element.prototype.update = function(field, value) {
-	this.toUpdate = this.toUpdate || {
-		id : this.id
+	element.position = {
+		x: elementTemplate.position ? (elementTemplate.position.x || 0) : 0,
+		y: elementTemplate.position ? (elementTemplate.position.y || 0) : 0,
+		z: elementTemplate.position ? (elementTemplate.position.z || 0) : 0,
+		angle: elementTemplate.position ? (elementTemplate.position.angle || 0) : 0};
+	
+	element.scale = {
+		x: elementTemplate.position ? (elementTemplate.position.scale ? (elementTemplate.position.scale.x || 1) : 1 ): 1,
+		y: elementTemplate.position ? (elementTemplate.position.scale ? (elementTemplate.position.scale.y || 1) : 1 ): 1
 	};
-	this.toUpdate[field] = this[field] = value;
 };
 
-Element.prototype.fullUpdate = function() {
-	this.toUpdate = this.toUpdate || { id : this.id };
-	this.toUpdate.elementX = this.elementX;
-	this.toUpdate.elementY = this.elementY;
-	this.toUpdate.elementZ = this.elementZ;
-	this.toUpdate.elementScaleX = this.elementScaleX;
-	this.toUpdate.elementScaleY = this.elementScaleY;
-	this.toUpdate.elementAngle = this.elementAngle;
-	this.toUpdate.typeName = this.typeName;
+Element.prototype.checkForUpdate = function(updatedData, field, value){
+	if (this.previousClientData[field] != value) 
+	{	
+		updatedData = updatedData || {id:this.id};
+		updatedData[field] = this.previousClientData[field] = value;
+	}
+	return updatedData;
 };
 
-Element.prototype.applyElementDecorator = function(decoratorType,
-		decoratorSettings) {
-	// console.log("applyElementDecorator: " + decoratorType);
+Element.prototype.getUpdatedClientData = function(){
+
+	this.previousClientData = this.previousClientData || {};
+	
+	var updatedData = null;
+	updatedData = this.checkForUpdate(updatedData, 'x', this.position.x);
+	updatedData = this.checkForUpdate(updatedData, 'y', this.position.y);
+	updatedData = this.checkForUpdate(updatedData, 'z', this.position.z);
+	updatedData = this.checkForUpdate(updatedData, 'angle', this.position.angle);
+	updatedData = this.checkForUpdate(updatedData, 'scaleX', this.scale.x);
+	updatedData = this.checkForUpdate(updatedData, 'scaleY', this.scale.y);
+	updatedData = this.checkForUpdate(updatedData, 'typeName', this.clientType);
+	return updatedData;
+};
+
+Element.prototype.applyElementDecorator = function(decoratorType, decoratorSettings) {
 
 	var decorator = decorators[decoratorType];
 
 	if (decorator) {
-		this.clonerData.push([ decoratorType, decoratorSettings ]);
 		decorator.applyTo(this, decoratorSettings);
 	} else {
 		console.log("applyElementDecorator: Not found: " + decoratorType);
 	}
 };
 
-/*
- * creanvas.Element.prototype.getCacheableValue = function(cacheKey, currentKey,
- * getData) { if (this.cachedValues[cacheKey] && this.cachedValues[cacheKey].key ==
- * currentKey) { return this.cachedValues[cacheKey].value; } var newValue =
- * getData.call(this); this.cachedValues[cacheKey] = {key:currentKey,
- * value:newValue}; return newValue; };
- */
+Element.prototype.applyElementType = function(elementType, elementSettings) {
 
-// unpractical syntax... ignore is unnatural here TODO
-Element.prototype.cloneElement = function(ignoreDecorators) {
-	// console.log("cloneElement : start cloning");
+	var elementType = elementTypes[elementType];
 
-	var elementsToApply = ignoreDecorators ? this.clonerData
-			.filter(function(d) {
-				return ignoreDecorators.every(function(toIgnore) {
-					return toIgnore != d[0];
-				});
-			}) : this.clonerData;
-
-	// console.log("cloneElement: apply " + elementsToApply.length + " stuff");
-
-	var clone = this.controller.addElement.apply(this.controller,
-			elementsToApply);
-	clone.update('elementZ', this.elementZ + 1);
-	return clone;
+	if (elementType) {
+		elementType.applyTo(this, elementSettings);
+	} else {
+		console.log("applyElementType: Not found: " + elementType);
+	}
 };
 
-/*
- * creanvas.Element.prototype.canHandleEvent = function(eventId) { // click,
- * pointerDown, always stopped by top element, even if not handled return
- * eventId == 'click' || eventId == 'pointerDown' ||
- * this.elementEvents.hasEvent(eventId); };
- */
+Element.prototype.cloneElement = function() {
 
-Element.prototype.applyElementDecorators = function() {
-	var element = this;
+	var clone = this.controller.addElement(this);
 
-	var newDecorators = [].slice.apply(arguments);
-
-	newDecorators.forEach(function(decoratorArgument) {
-		element.applyElementDecorator(decoratorArgument[0],
-				decoratorArgument[1]);
-	});
+	clone.position.z = this.position.z + 1;
+	return clone;
 };
 
 Element.prototype.triggerEvent = function(eventData) {
@@ -176,10 +142,37 @@ Element.prototype.removeEventListener = function(id) {
 	});
 };
 
-
 Element.prototype.isPointInElementEdges = function(x, y) {
 
-	var element = this;
+	var local = this.getElementXYFromRealXY({x:x, y:y});
+	
+	if(!this.solid.isInside)
+		return false;
+	
+	return this.solid.isInside.call(this, local.x, local.y);
+
+/*	var elementType = element.controller.elementTypes.filter(function(t){ return t.typeName == element.typeName})[0];
+
+	var imageData = elementType.imageData;
+	
+	var local = this.getElementXYFromRealXY({x:x, y:y});
+	
+	var imageX = local.x - elementType.boxData.left;
+	var imageY = local.y - elementType.boxData.top;
+	
+	if (imageX < 0 || 
+			imageX >= elementType.boxData.width || 
+			imageY < 0 || 
+			imageY >= elementType.boxData.height)
+	{
+		//console.log(local.x + ' , ' + local.y + '  not in  ' + elementType.boxData.width + ' , ' + elementType.boxData.height  );
+		return false;
+	}
+
+	if (imageData[elementType.boxData.width*4*imageY + 4*imageX + 3]>50)
+		console.log(x + ',' + y + ' / ' + local.x + ' , ' + local.y + '  is inside - ' + imageData[elementType.boxData.width*4*imageY + 4*imageX + 3]);
+
+	return imageData[elementType.boxData.width*4*imageY + 4*imageX + 3]>50;
 	
 	// borderline effect with ==y
 	var realEdges = element.getRealCornerEdges().map(
@@ -213,23 +206,62 @@ Element.prototype.isPointInElementEdges = function(x, y) {
 			; });
 
 	return intersections.length % 2 == 1;
+*/
 };
 
-Element.prototype.getRealXYFromElementXY  = function(elementXY)
+Element.prototype.getRealXYFromElementXY  = function(xY)
 {	
 	var element= this;
 	
 	var xy = { 
-		x: (element.elementX + element.elementScaleX * (elementXY.x*Math.cos(element.elementAngle) - elementXY.y*Math.sin(element.elementAngle))),
-		y: (element.elementY + element.elementScaleY * (elementXY.x*Math.sin(element.elementAngle) + elementXY.y*Math.cos(element.elementAngle)))};
+		x: (element.position.x + element.scale.x * (xY.x*Math.cos(element.position.angle) - xY.y*Math.sin(element.position.angle))),
+		y: (element.position.y + element.scale.y * (xY.x*Math.sin(element.position.angle) + xY.y*Math.cos(element.position.angle)))};
 	
-	//console.log ("("+ elementXY.x  +","+ elementXY.y+") => ("+ xy.x  +","+ xy.y+")");
+	//console.log ("("+ xY.x  +","+ xY.y+") => ("+ xy.x  +","+ xy.y+")");
 	return xy;
 };
 
+Element.prototype.addHistory = function(info){
+	this.history = this.history || [];
+	this.history.unshift(this.id + ' - ' + this.round(this.controller.getTime()) + ' - ' + info);	
+};
+
+Element.prototype.displayHistory = function(count) {
+	for (var i=0; i<count && i<this.history.length; i++)
+	{
+		console.log(this.history[i]);					
+	}
+};
+
+Element.prototype.round = function(x){
+	return Math.round(10000*x)/10000;
+};
+
+Element.prototype.getElementXYFromRealXY = function(real)
+{		
+	var element = this;
+
+	//var elementType = element.controller.elementTypes.filter(function(t){ return t.typeName == element.typeName})[0];
+
+	return {
+		x: Math.round((real.x - element.position.x)/element.scale.x*Math.cos(element.position.angle) 
+			+ (real.y - element.position.y)/element.scale.y*Math.sin(element.position.angle)),
+		y: Math.round(-(real.x - element.position.x)/element.scale.x*Math.sin(element.position.angle) 
+			+ (real.y - element.position.y)/element.scale.y*Math.cos(element.position.angle))
+		};
+
+/*		return {
+			x: elementType.boxData.left + Math.round((real.x - element.position.x)/element.scale.x*Math.cos(element.position.angle) 
+				+ (real.y - element.position.y)/element.scale.y*Math.sin(element.position.angle)),
+			y: elementType.boxData.top + Math.round(-(real.x - element.position.x)/element.scale.x*Math.sin(element.position.angle) 
+				+ (real.y - element.position.y)/element.scale.y*Math.cos(element.position.angle))
+			};*/
+};
+
+/*
 Element.prototype.getEdges = function()
 {
-	if (this.edges)
+	if (this.edges && this.edges.length>0)
 		return this.edges;
 
 	var element = this;
@@ -240,29 +272,38 @@ Element.prototype.getEdges = function()
 		return [];
 
 	return this.edges = elementType[0].edges; 	
-}
+}*/
 
 Element.prototype.getDistance = function(x,y)
 {
-	return Math.sqrt((this.elementX-x)*(this.elementX-x) + (this.elementY-y)*(this.elementY-y));
+	return Math.sqrt((this.position.x-x)*(this.position.x-x) + (this.position.y-y)*(this.position.y-y));
 };
 
+/*
 Element.prototype.getRealCornerEdges  = function()
 {
 	return this.getRealEdges().edges.filter(function(edge){ return edge.isCorner;});
 };
+*/
+// the new
+Element.prototype.getBoundaryBox  = function()
+{
+	if (this.elementType)
+		return this.elementType.getBoundaryBox();
+};
 
+/*
 Element.prototype.getRealEdges  = function()
 {
 	var element = this;
 
 	if (!this.realEdges 
 			|| this.realEdges.edges.length == 0
-			|| this.realEdges.info.x!=this.elementX 
-			|| this.realEdges.info.y!=this.elementY
-			|| this.realEdges.info.angle!=this.elementAngle
-			|| this.realEdges.info.scaleX!=this.elementScaleX
-			|| this.realEdges.info.scaleY!=this.elementScaleY)
+			|| this.realEdges.info.x!=this.position.x 
+			|| this.realEdges.info.y!=this.position.y
+			|| this.realEdges.info.angle!=this.position.angle
+			|| this.realEdges.info.scaleX!=this.scale.x
+			|| this.realEdges.info.scaleY!=this.scale.y)
 	{
 		var realEdges = this.getEdges().map(function(e){ 
 			var xy = element.getRealXYFromElementXY(e);
@@ -273,11 +314,11 @@ Element.prototype.getRealEdges  = function()
 			{	
 				info:
 				{
-					x: this.elementX,
-					y: this.elementY,
-					angle: this.elementAngle,
-					scaleX: this.elementScaleX,
-					scaleY: this.elementScaleY
+					x: this.position.x,
+					y: this.position.y,
+					angle: this.position.angle,
+					scaleX: this.scale.x,
+					scaleY: this.scale.y
 				},
 				edges: realEdges,
 				box:
@@ -290,8 +331,45 @@ Element.prototype.getRealEdges  = function()
 				}
 			};
 	}
-
+		
 	return this.realEdges
 };
+
+Element.prototype.getRealBox  = function()
+{
+	var element = this;
+
+	if (!this.realBox 
+			|| this.realBox.info.x!=this.position.x 
+			|| this.realBox.info.y!=this.position.y
+			|| this.realBox.info.angle!=this.position.angle
+			|| this.realBox.info.scaleX!=this.scale.x
+			|| this.realBox.info.scaleY!=this.scale.y)
+	{
+		var realEdges=[];
+		realEdges.push(element.getRealXYFromElementXY({x:element.box.left,y:element.box.top}));
+		realEdges.push(element.getRealXYFromElementXY({x:element.box.right,y:element.box.top}));
+		realEdges.push(element.getRealXYFromElementXY({x:element.box.left,y:element.box.bottom}));
+		realEdges.push(element.getRealXYFromElementXY({x:element.box.right,y:element.box.bottom}));
+
+		this.realBox = 
+			{	
+				info:
+				{
+					x: this.position.x,
+					y: this.position.y,
+					angle: this.position.angle,
+					scaleX: this.scale.x,
+					scaleY: this.scale.y
+				},
+				left: realEdges.reduce(function(current,edge){ return Math.min(current,edge.x);}, Infinity),
+				top: realEdges.reduce(function(current,edge){ return Math.min(current,edge.y);}, Infinity),
+				right: realEdges.reduce(function(current,edge){ return Math.max(current,edge.x);}, 0),
+				bottom: realEdges.reduce(function(current,edge){ return Math.max(current,edge.y);}, 0)				
+			};
+	}
+	
+	return this.realBox;
+};*/
 
 exports.Element = Element;

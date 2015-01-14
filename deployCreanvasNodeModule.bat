@@ -19,7 +19,14 @@ REM --compilation_level SIMPLE_OPTIMIZATIONS
 cd ..
 
 copy Server\* ..\..\www\CreanvasNodeModule\
+
 if not exist ..\..\www\CreanvasNodeModule\Decorators mkdir ..\..\www\CreanvasNodeModule\Decorators
 copy Server\Decorators\* ..\..\www\CreanvasNodeModule\Decorators\
+
+if not exist ..\..\www\CreanvasNodeModule\CollisionSolver mkdir ..\..\www\CreanvasNodeModule\CollisionSolver
+copy Server\CollisionSolver\* ..\..\www\CreanvasNodeModule\CollisionSolver\
+
+if not exist ..\..\www\CreanvasNodeModule\ElementTypes mkdir ..\..\www\CreanvasNodeModule\ElementTypes
+copy Server\ElementTypes\* ..\..\www\CreanvasNodeModule\ElementTypes\
 
 cd ..\..\www

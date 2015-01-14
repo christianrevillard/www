@@ -1,166 +1,142 @@
-var vector = require('../Vector');
-
 var applyTo = function(element, elementMoving)
 {	
 	console.log('Applying moving');	
-	element.movingElement = new MovingElement(element, elementMoving);		
+	element.moving = new MovingElement(element, elementMoving);		
 }		
 
 var MovingElement = function(parent, elementMoving)
 {	
-	var element = this; // rewrite...
-	element.parent = parent;
-	element.movingSpeed = new vector.Vector( elementMoving.vx || 0, elementMoving.vy || 0);
-	element.movingAcceleration = new vector.Vector( elementMoving.ax || 0,  elementMoving.ay || 0);
-	element.omega = elementMoving.rotationSpeed || 0;
+	var moving = this;
 	
-	element.movingLimits = {
-		vMax: elementMoving.vMax || Infinity,
-		xMin: elementMoving.xMin || -Infinity,
-		yMin: elementMoving.yMin || -Infinity,
-		xMax: elementMoving.xMax || Infinity,
-		yMax: elementMoving.yMax || Infinity
+	moving.parent = parent;
+	
+	elementMoving.speed = elementMoving.speed || {};
+	
+	moving.speed = {
+		x: elementMoving.speed.x || 0, 
+		y: elementMoving.speed.y || 0, 
+		angle: elementMoving.speed.angle || 0
 	};
 	
-	element.lastUpdated = element.parent.controller.getTime();
+	elementMoving.acceleration = elementMoving.acceleration || {};
+
+	moving.acceleration = { 
+		x: elementMoving.acceleration.x || 0, 
+		y: elementMoving.acceleration.y || 0,
+		angle: elementMoving.acceleration.angle || 0
+	};
+
+	elementMoving.scaleSpeed = elementMoving.scaleSpeed || {};
+
+	moving.scaleSpeed = { 
+		x: elementMoving.scaleSpeed.x || 0, 
+		y: elementMoving.scaleSpeed.y || 0
+	};
+
+	elementMoving.movingLimits = elementMoving.movingLimits || {};
+
+	moving.movingLimits = {
+		vMax: elementMoving.movingLimits.vMax === 0 ? 0 : elementMoving.movingLimits.vMax || Infinity,
+		xMin: elementMoving.movingLimits.xMin === 0 ? 0 : elementMoving.movingLimits.xMin || -Infinity,
+		yMin: elementMoving.movingLimits.yMin === 0 ? 0 : elementMoving.movingLimits.yMin || -Infinity,
+		xMax: elementMoving.movingLimits.xMax === 0 ? 0 : elementMoving.movingLimits.xMax || Infinity,
+		yMax: elementMoving.movingLimits.yMax === 0 ? 0 : elementMoving.movingLimits.yMax || Infinity
+	};
 	
-	parent.controller.setInterval(
-		function(){ element.move() },
-		40);
+	moving.lastUpdated = moving.parent.controller.getTime();
 };
 
-MovingElement.prototype.move = function()
-{
-	var rollbackData;
-	var element = this;
+// do not take previous here, do it at caller
 
-	var currentTime = element.parent.controller.getTime();
-	var dt = currentTime - element.lastUpdated;
-
-	if (dt < 0.001)
+MovingElement.prototype.commitMove = function()
+{	
+	if(!this.dt)
 		return;
+	
+	this.speed.x += this.acceleration.x * this.dt;
+	this.speed.y += this.acceleration.y * this.dt;
+	this.speed.angle += this.acceleration.angle * this.dt;
+	
+	this.originalPosition = null;
+	this.originalScale = null;
+	this.originalBoundaryBox = null;
+	
+	this.dt = null;
+};
 
-	element.lastUpdated = currentTime;
-	
-	if (element.targetElementX !== undefined && element.targetElementY !== undefined )
-	{
-		//overriding speed until we get there.
-		if (!element.originalSpeed)
-			element.originalSpeed = element.movingSpeed
-	
-			element.movingSpeed =  new vector.Vector( 
-					(element.targetElementX - element.parent.elementX)/dt,
-					(element.targetElementY - element.parent.elementY)/dt);
+MovingElement.prototype.updatePosition = function(dt) {	
 
-		var v = Math.sqrt(element.movingSpeed.x*element.movingSpeed.x + element.movingSpeed.y*element.movingSpeed.y);
-		if (v > element.movingLimits.vMax)
-		{
-			element.movingSpeed.x *= element.movingLimits.vMax / v;
-			element.movingSpeed.y *= element.movingLimits.vMax / v;
-		}
-	}
-	else
+	if (this.speed.x==0 && this.speed.y==0 && this.speed.angle==0 && this.acceleration.x==0 && this.acceleration.y==0) // tood add scale
 	{
-		element.movingSpeed.x += element.movingAcceleration.x * dt;
-		element.movingSpeed.y += element.movingAcceleration.y * dt;			
-	}
-	
-	
+		this.dt=0;
 
-	if (element.movingSpeed.x == 0 &&
-			element.movingSpeed.y == 0 &&
-			element.omega == 0 &&
-			(!element.elementScaleSpeed ||(
-			element.elementScaleSpeed.x == 0 && element.elementScaleSpeed.y==0						
-			)))
-	{
+		this.bigBoundaryBox = this.parent.boundaryBox = this.parent.getBoundaryBox();
+			
 		return;
 	}
+
+	// Can do something when originalPoistion is not null.
+	this.originalPosition = this.originalPosition || this.parent.position;	
+	this.originalScale = this.originalScale|| this.parent.scale;	
+	this.originalBoundaryBox = this.originalBoundaryBox || this.parent.boundaryBox;	
 	
+	this.dt = dt;
 
-	dElementX = element.movingSpeed.x * dt; 
-	dElementY = element.movingSpeed.y * dt; 
-	dElementAngle = element.omega * dt;
-	dElementScaleX = element.elementScaleSpeed?element.elementScaleSpeed.x * dt : 0;
-	dElementScaleY = element.elementScaleSpeed?element.elementScaleSpeed.y * dt : 0;
+	this.parent.position = {
+		x: this.originalPosition.x + this.speed.x * dt,
+		y: this.originalPosition.y + this.speed.y * dt,
+		angle: this.originalPosition.angle + this.speed.angle * dt
+	};
 
+	this.parent.scale = {
+		x: this.originalScale.x + (this.scaleSpeed?this.scaleSpeed.x * dt : 0),
+		y: this.originalScale.y + (this.scaleSpeed?this.scaleSpeed.y * dt : 0) 
+	};
+
+	if (this.parent.position.x > this.movingLimits.xMax)
+	{
+		this.parent.position.x = this.movingLimits.xMax; 
+	}
+
+	if (this.parent.position.x < this.movingLimits.xMin)
+	{
+		this.parent.position.x = this.movingLimits.xMin; 
+	}
+
+	if (this.parent.position.y > this.movingLimits.yMax) 				
+	{
+		this.parent.position.y = this.movingLimits.yMax; 
+	}
+
+	if (this.parent.position.y < this.movingLimits.yMin) 				
+	{
+		this.parent.position.y = this.movingLimits.yMin; 
+	}
+
+	this.parent.boundaryBox = this.parent.getBoundaryBox();
+
+	// only needed with max dt!
+	this.bigBoundaryBox = {
+		left: Math.min(this.parent.boundaryBox.left, this.originalBoundaryBox.left),
+		top: Math.min(this.parent.boundaryBox.top, this.originalBoundaryBox.top),
+		right: Math.max(this.parent.boundaryBox.right, this.originalBoundaryBox.right),
+		bottom: Math.max(this.parent.boundaryBox.bottom, this.originalBoundaryBox.bottom)
+	};
+			
+	/*
+	if (moving.targetElementX !== undefined)
+	{
+ 		if ( 
+		(moving.targetElementX-moving.parent.position.x)*(moving.targetElementX-moving.parent.position.x)<1
+		&& (moving.targetElementY-moving.parent.position.y)*(moving.targetElementY-moving.parent.position.y) <1)
+		{
+			moving.targetElementX = moving.targetElementY = undefined;
+			moving.speed = moving.originalSpeed || { x:0, y:0, angle:0};
+		}
+	}
+*/
+	//moving.parent.previousTiles = moving.parent.broadTiles;
 	
-	// check the rules for angle and scale... must correspond to about a point
-	var discret = Math.ceil(
-			Math.max(
-					Math.abs(dElementX), 
-					Math.abs(dElementY), 
-					Math.abs(dElementAngle*180*Math.PI),
-					Math.abs(dElementScaleX*10), 
-					Math.abs(dElementScaleY*10) 
-					)				
-	);
-	
-	for (var inc=0; inc<discret; inc++)
-	{			
-		element.rollbackData = 
-		{
-				elementX: element.parent.elementX, 
-				elementY:element.parent.elementY, 
-				elementAngle:element.parent.elementAngle,
-				elementScaleX:element.parent.elementScaleX,
-				elementScaleY:element.parent.elementScaleY
-		};
-
-		element.parent.elementX += dElementX/discret; 
-		element.parent.elementY += dElementY/discret; 
-		element.parent.elementAngle += dElementAngle/discret;
-		element.parent.elementScaleX += dElementScaleX/discret;
-		element.parent.elementScaleY += dElementScaleY/discret;
-
-		if (element.parent.preMove && !element.parent.preMove())
-		{
-//			console.log('Cannot move  '+ element.id);
-			element.parent.elementX = element.rollbackData.elementX; 
-			element.parent.elementY = element.rollbackData.elementY;
-			element.parent.elementAngle = element.rollbackData.elementAngle;
-			element.parent.elementScaleX = element.rollbackData.elementScaleX;
-			element.parent.elementScaleY = element.rollbackData.elementScaleY;
-			return;
-		}
-
-		if ( element.parent.elementX>element.movingLimits.xMax || element.parent.elementX<element.movingLimits.xMin)
-		{
-			element.parent.elementX = element.rollbackData.elementX; 
-		}
-
-		if (element.parent.elementY>element.movingLimits.yMax || element.parent.elementY<element.movingLimits.yMin) 				
-		{
-			element.parent.elementY = element.rollbackData.elementY; 
-		}
-		
-		if (element.targetElementX !== undefined)
-		{
-			if ( 
-			(element.targetElementX-element.parent.elementX)*(element.targetElementX-element.parent.elementX)<1
-			&& (element.targetElementY-element.parent.elementY)*(element.targetElementY-element.parent.elementY) <1)
-			{
-				element.targetElementX = element.targetElementY = undefined;
-				element.movingSpeed = element.oringalSpeed || new vector.Vector(0,0);
-			}
-		}
-
-		element.parent.update('elementX', element.parent.elementX);
-		element.parent.update('elementY', element.parent.elementY);				
-
-		var newAngle = element.parent.elementAngle;
-		while (newAngle > Math.PI)
-			newAngle-= 2* Math.PI
-		while (newAngle < -Math.PI)
-			newAngle+= 2* Math.PI
-		element.parent.update('elementAngle', newAngle );
-
-		if (element.parent.elementScaleSpeed)
-		{
-			element.parent.update('elementScaleX', element.parent.elementScaleX);	
-			element.parent.update('elementScaleY', element.parent.elementScaleY);	
-		}
-	}		
 };
 
 exports.applyTo = applyTo;
