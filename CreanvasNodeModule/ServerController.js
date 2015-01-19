@@ -4,11 +4,6 @@ var serverElement = require("./ServerElement");
 console.log('Controller: requiring AAB');
 var aab = require("./ElementTypes/AxeAlignedBox");
 
-console.log('cc.serverElement: ' + serverElement);
-console.log('cc.serverElement.Testing: ' + serverElement.Testing);
-console.log('cc.serverElement.Testing2: ' + serverElement.Testing2);
-console.log('cc.serverElement.Element: ' + serverElement.Element);
-
 var circle = require("./ElementTypes/Circle");
 
 

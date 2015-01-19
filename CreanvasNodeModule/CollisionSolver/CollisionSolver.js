@@ -104,7 +104,11 @@ CollisionSolver.prototype.processNarrowPhase = function(collisionsToCheck, eleme
 				return;
 			if (!c.status)
 				return;
-			collisions.push({e1:e, e2:c.collisionWith, collisionPoint:c.collisionPoint});
+			collisions.push({
+				e1:e, 
+				e2:c.collisionWith,
+				collisionHandler:c.collisionHandler
+			});
 		});
 		e.collisions = null;
 	});
@@ -121,7 +125,7 @@ CollisionSolver.prototype.checkForCollision = function(c, collisionsToCheck){
 	if (!c.e1.moving.dt  && !c.e2.moving.dt)
 		return;
 					
-	var collision = c.collisionHandler.getCollision(c.e1, c.e2); // must send speed too... try with the currrent one.
+	var collision = c.collisionHandler.getCollision(c.e1, c.e2);
 				
 	if (!collision.collided)
 	{
@@ -132,12 +136,14 @@ CollisionSolver.prototype.checkForCollision = function(c, collisionsToCheck){
 	}
 
 	c.e1.collisions[c.e2.id].status = c.e2.collisions[c.e1.id].status = true;
-	c.e1.collisions[c.e2.id].collisionPoint = c.e2.collisions[c.e1.id].collisionPoint = collision.collisionPoint;
+	//c.e1.collisions[c.e2.id].collisionPoint = c.e2.collisions[c.e1.id].collisionPoint = collision.collisionPoint;
 
 	this.moveOutOfOverlap(c.collisionHandler, c.e1, c.e2);
 
 	c.e1.collisions[c.e2.id].checkedDt = c.e1.moving.dt;
 	c.e2.collisions[c.e1.id].checkedDt = c.e2.moving.dt;
+	c.e1.collisions[c.e2.id].collisionHandler = c.collisionHandler;
+	c.e2.collisions[c.e1.id].collisionHandler = c.collisionHandler;
 
 	this.requeuePossibleCollisions(collisionsToCheck, c.e1);
 	this.requeuePossibleCollisions(collisionsToCheck, c.e2);		
@@ -277,7 +283,7 @@ CollisionSolver.prototype.getCollisionPoint = function(edges)
 		vectors: vector.getUnitVectors(point1.x, point1.y,  point2.x , point2.y)};			
 };*/
 
-CollisionSolver.prototype.getCollisionDetails = function (element, other, collisionPoint)
+CollisionSolver.prototype.getCollisionDetails = function (element, other, collisionHandler)//, collisionPoint)
 {
 	if (element.solid.mass == Infinity && other.solid.mass == Infinity)
 	{
@@ -287,13 +293,11 @@ CollisionSolver.prototype.getCollisionDetails = function (element, other, collis
 	var 
 		colVectors, speedElement, speedOther, localSpeedElement, localSpeedOther, centerCollisionElement,l1,
 		centerCollisionOther,l2;
-	
-//	var collisionPoint = this.getCollisionPoint(collisionPoint);
 
-	//console.log("collisionPoint summary : " + collisionPoint.x + "," + collisionPoint.y);
+	var collisionGeometry = collisionHandler.getCollisionPoint(element, other);
 
-	colVectors = element.getCollisionVectors(collisionPoint);
-		//collisionPoint.vectors;
+	colVectors = vector.getUnitVectorsByNormal(0,0,collisionGeometry.normalVector.x, collisionGeometry.normalVector.y);
+	var collisionPoint = collisionGeometry.collisionPoint;
 		
 	centerCollisionElement = new vector.Vector(collisionPoint.x-element.position.x, collisionPoint.y-element.position.y);								
 	l1 = vector.vectorProduct(centerCollisionElement, colVectors.v).z;		
@@ -304,19 +308,27 @@ CollisionSolver.prototype.getCollisionDetails = function (element, other, collis
 	var elementRot = vector.vectorProduct(
 			centerCollisionElement,
 			colVectors.v);	
-
+	
 	var otherRot = vector.vectorProduct(
 			centerCollisionOther,
 			colVectors.v);	
+		
+	var elementLocalSpeedRot = vector.vectorProduct(
+		elementRot,
+		centerCollisionElement);
+
+	var otherLocalSpeedRot = vector.vectorProduct(
+			otherRot,
+			centerCollisionOther);
 
 	speedElement = element.moving ? new vector.Vector(
-		element.moving.speed?element.moving.speed.x:0, 
-		element.moving.speed?element.moving.speed.y:0)
+		element.moving.speed?(element.moving.speed.x + elementLocalSpeedRot.x):0, 
+		element.moving.speed?(element.moving.speed.y + elementLocalSpeedRot.y):0)
 	: new vector.Vector(0,0);
 	
 	speedOther = other.moving ? new vector.Vector(
-		other.moving.speed?other.moving.speed.x:0, 
-		other.moving.speed?other.moving.speed.y:0):
+		other.moving.speed?(other.moving.speed.x + otherLocalSpeedRot.x):0, 
+		other.moving.speed?(other.moving.speed.y + otherLocalSpeedRot.x):0):
 			new vector.Vector(0,0);
 
 	if (element.moving && element.moving.scaleSpeed)
@@ -336,37 +348,38 @@ CollisionSolver.prototype.getCollisionDetails = function (element, other, collis
 
 	var elementMass = element.fixedPoint ? Infinity:element.solid.mass;
 	var otherMass = other.fixedPoint ? Infinity:other.solid.mass;
-	var elementMOI = element.fixed ? Infinity:element.solid.getMomentOfInertia();
-	var otherMOI = other.fixed ? Infinity:other.solid.getMomentOfInertia();
-	
-	var F = element.solid.collisionCoefficient * other.solid.collisionCoefficient * 2 *
-		(localSpeedOther.v - localSpeedElement.v 
-				+ other.moving.speed.angle * otherRot.z 
-				- element.moving.speed.angle * elementRot.z)
-		/( 1/otherMass + 1/elementMass + otherRot.z*otherRot.z/otherMOI + elementRot.z*elementRot.z/elementMOI );
-	
-	/*
-	console.log('F1: ' + element.solid.collisionCoefficient);
-	console.log('F2: ' + localSpeedOther.v);
-	console.log('F3: ' + localSpeedElement.v); 
-	console.log('F4: ' + other.moving.speed.angle);
-	console.log('F5: ' + otherRot.z );
-	console.log('F6: ' + element.moving.speed.angle);
-	console.log('F7: ' + elementRot.z);
-	console.log('F8: ' + otherMass);
-	console.log('F9: ' + elementMass);
-	console.log('F0: ' + otherMOI );
-	console.log('F1: ' + elementMOI );*/
+	// not beautiful...
+	var elementMOI = element.fixed ? Infinity: (element.getMomentOfInertia ? element.getMomentOfInertia(): element.solid.getMomentOfInertia());
+	var otherMOI = other.fixed ? Infinity: (other.getMomentOfInertia ? other.getMomentOfInertia(): other.solid.getMomentOfInertia());
+
+	var elementStuff = 
+		vector.scalarProduct(
+			vector.vectorProduct(
+				elementRot,
+				centerCollisionElement),
+			colVectors.v)/elementMOI;
+
+	var otherStuff = 
+		vector.scalarProduct(
+			vector.vectorProduct(
+				otherRot,
+				centerCollisionOther),
+			colVectors.v)/otherMOI;
+
+	var impulse = 
+		-( 1 + element.solid.collisionCoefficient * other.solid.collisionCoefficient)
+		* (localSpeedOther.v - localSpeedElement.v)
+		/( 1/elementMass + 1/otherMass + elementStuff + otherStuff);
 
 	return {
 		e1:{
-			dSpeedX: F/elementMass*colVectors.v.x,
-			dSpeedY: F/elementMass*colVectors.v.y,
-			dSpeedAngle: F * l1 / elementMOI},
+			dSpeedX: -impulse/elementMass*colVectors.v.x,
+			dSpeedY: -impulse/elementMass*colVectors.v.y,
+			dSpeedAngle: - impulse * elementRot.z / elementMOI},
 		e2:{
-			dSpeedX: -F/otherMass*colVectors.v.x,
-			dSpeedY: -F/otherMass*colVectors.v.y,
-			dSpeedAngle:- F * l2 / otherMOI}
+			dSpeedX: impulse/otherMass*colVectors.v.x,
+			dSpeedY: impulse/otherMass*colVectors.v.y,
+			dSpeedAngle: impulse * otherRot.z / otherMOI}
 	};
 };
 
@@ -395,23 +408,39 @@ CollisionSolver.prototype.updateSpeeds = function(collisionList){
 		
 		c.collisionDetails = collisionSolver.getCollisionDetails(
 				c.e1, 
-				c.e2, 
-				// IN PROGRESS
-				c.collisionPoint);
+				c.e2,
+				c.collisionHandler);
 
-		// todo - not dy here !!!
-		if (Math.abs(c.collisionDetails.e1.dSpeedY)>0)
-		{
-			c.e1.moving.speed.x += c.collisionDetails.e1.dSpeedX;
-			c.e1.moving.speed.y += c.collisionDetails.e1.dSpeedY;
-			c.e1.moving.speed.angle += c.collisionDetails.e1.dSpeedAngle;
-		}
-		if (Math.abs(c.collisionDetails.e2.dSpeedY)>0)
-		{
-			c.e2.moving.speed.x += c.collisionDetails.e2.dSpeedX;
-			c.e2.moving.speed.y += c.collisionDetails.e2.dSpeedY;
-			c.e2.moving.speed.angle += c.collisionDetails.e2.dSpeedAngle;
-		}
+	/*console.log(
+			'collsion: x:' + c.collisionPoint.x 
+			+ ', y:' +c.collisionPoint.y); 
+
+		console.log(
+			'e1: x:' +c.e1.position.x 
+			+ ', y:' +c.e1.position.y 
+			+ ', vx:' +c.e1.moving.speed.x
+			+ ', vy:' +c.e1.moving.speed.y
+			+ ', dvx:' +c.collisionDetails.e1.dSpeedX
+			+ ', dvy:' +c.collisionDetails.e1.dSpeedY
+			+ ', dOmega:'+ c.collisionDetails.e1.dSpeedAngle);
+
+		console.log(
+				'e2: x:' +c.e2.position.x 
+				+ ', y:' +c.e2.position.y 
+				+ ', vx:' +c.e2.moving.speed.x
+				+ ', vy:' +c.e2.moving.speed.y
+				+ ', dvx:'+ c.collisionDetails.e2.dSpeedX
+				+ ', dvy:'+ c.collisionDetails.e2.dSpeedY
+				+ ', dOmega:' +c.collisionDetails.e2.dSpeedAngle);
+	*/
+
+		c.e1.moving.speed.x += c.collisionDetails.e1.dSpeedX;
+		c.e1.moving.speed.y += c.collisionDetails.e1.dSpeedY;
+		c.e1.moving.speed.angle += c.collisionDetails.e1.dSpeedAngle;
+
+		c.e2.moving.speed.x += c.collisionDetails.e2.dSpeedX;
+		c.e2.moving.speed.y += c.collisionDetails.e2.dSpeedY;
+		c.e2.moving.speed.angle += c.collisionDetails.e2.dSpeedAngle;
 	});
 };	
 

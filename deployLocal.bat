@@ -47,4 +47,7 @@ cd ..
 cd pong
 call ..\..\www\deployWebServerApp.bat
 cd ..
+cd testSuite
+call ..\..\www\deployWebServerApp.bat
+cd ..
 cd ..\www

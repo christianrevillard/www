@@ -37,12 +37,9 @@ CircleElement.prototype.getBoundaryBox  = function()
 	};
 };
 
-CircleElement.prototype.getCollisionVectors  = function(collisionPoint) {
-	return vector.getUnitVectorsByNormal(
-		this.position.x, 
-		this.position.y,  
-		collisionPoint.x, 
-		collisionPoint.y);
-};			
+CircleElement.prototype.getMomentOfInertia = function()
+{			
+	return this.solid.mass / 2 * this.radius * this.radius;
+};
 
 exports.CircleElement = CircleElement;

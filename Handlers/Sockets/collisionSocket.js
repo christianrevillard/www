@@ -107,109 +107,37 @@ var CollisionTest = function(collision, socket){
 	};
 	
 	
-for (var i=100;i<500;i=i+100) //400
-for (var j=200;j<400;j=j+100)
-{
-	this.controller.addCircle({
-		name: 'round1',
-		clientType: 'round',
-		radius: 10,
-		position: {x: i, y: j-1.2*(i/5)},			
-		solid: {mass:1, collisionCoefficient:1},
-		moving: {speed:{x:i-300,y:j-200},acceleration:{y:500}}
-	});
-	this.controller.addCircle({
-		name: 'round1',
-		clientType: 'bigRound',
-		radius: 25,
-		position: {x: i, y: j-1.2*(i/5)+10+1+25},			
-		solid: {mass:2, collisionCoefficient:1},
-		moving: {speed:{x:i-300,y:j-200},acceleration:{y:500}}
-	});
-};
+	for (var i=100;i<500;i=i+100) 
+	for (var j=200;j<400;j=j+100)
+//	for (var i=300;i<301;i=i+100) 
+//		for (var j=300;j<301;j=j+100)
+	{
+		this.controller.addCircle({
+			name: 'round1',
+			clientType: 'round',
+			radius: 10,
+			position: {x: i, y: j-1.2*(i/5)},			
+			solid: {mass:1, collisionCoefficient:1},
+			moving: {speed:{x:i-300,y:j-200},acceleration:{y:0}}
+		});
+				this.controller.addCircle({
+			name: 'round1',
+			clientType: 'bigRound',
+			radius: 25,
+			position: {x: i, y: j-1.2*(i/5)+10+1+25},			
+			solid: {mass:2, collisionCoefficient:1},
+			moving: {speed:{x:i-300,y:j-200},acceleration:{y:0}}
+		});
 /*
-for (var i=100;i<600;i=i+20)
-for (var j=310;j<311;j=j+20)
-	this.controller.addElement({
-		name: 'round1',
-		typeName: 'round',
-		position: {x: i, y: j-i/5},			
-		solid: {mass:Infinity}
-	});*/
-
-/*	this.controller.addElement({
-		name: 'round2',
-		typeName: 'round',
-		position: {x: 500, y: 250 },			
-		solid: {
-			mass:1,
-			isInside:function(x,y){ return x*x + y*y < 2500;}}, // to do: RoundElement
-		moving: {speed:{x:-100}}
-	});
-*/
-	/*
-	for (i=10;i<15;i++)
-	{
-		this.controller.addElement({
-			name: 'round1',
-			typeName: 'round',
-			box: {width:700, height:20 },
-			position: {x: 25*i, y: 20},			
-			solid: {mass:1},
-			moving: {speed:{y:100}}
-		});
-
-		this.controller.addElement({
-			name: 'round1',
-			typeName: 'round',
-			box: {width:700, height:20 },
-			position: {x: 25*i, y: 470},			
-			solid: {mass:1},
-			moving: {speed:{y:-100}}
-		});
-	}
-
-	for (i=4;i<25;i++)
-	{
-		this.controller.addElement({
-			name: 'round1',
-			typeName: 'round',
-			box: {width:700, height:20 },
-			position: {x: 25*i+10, y: 100},			
-			solid: {mass:1},
-			moving: {speed:{y:150}}
-		});
-
-		this.controller.addElement({
-			name: 'round1',
-			typeName: 'round',
-			box: {width:700, height:20 },
-			position: {x: 25*i+10, y: 350},			
-			solid: {mass:1},
-			moving: {speed:{y:-150}}
-		});
-	}
-
-	for (i=2;i<20;i++)
-	{
-		this.controller.addElement({
-			name: 'round1',
-			typeName: 'round',
-			box: {width:700, height:20 },
-			position: {x: 20, y: 25*i},			
-			solid: {mass:1},
-			moving: {speed:{x:100}}
-		});
-
-		this.controller.addElement({
-			name: 'round1',
-			typeName: 'round',
-			box: {width:700, height:20 },
-			position: {x: 680, y: 25*i},			
-			solid: {mass:1},
-			moving: {speed:{x:-100}}
-		});
-	}*/
+			this.controller.addCircle({
+				name: 'round1',
+				clientType: 'bigRound',
+				radius: 25,
+				position: {x: i, y: j-1.2*(i/5)+10+1+25},			
+				solid: {mass:2, collisionCoefficient:1},
+				moving: {speed:{x:0,y:j-50},acceleration:{y:0}}
+			});*/
+	};
 	
 	this.disconnect = function()
 	{
