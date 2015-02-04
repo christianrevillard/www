@@ -109,17 +109,6 @@ if (TEST) {
         }).forEach(function(element) {
           element.drawMyself();
         });
-        controller.context.lineStyle = "black";
-        controller.context.beginPath();
-        for (var i = 100;i < 700;i += 50) {
-          controller.context.moveTo(i, 0);
-          controller.context.lineTo(i, 500);
-        }
-        for (var i = 100;i < 500;i += 50) {
-          controller.context.moveTo(0, i);
-          controller.context.lineTo(700, i);
-        }
-        controller.context.stroke();
         if (controller.displayMessage) {
           controller.displayMessage(controller.context);
         }
@@ -271,6 +260,9 @@ if (TEST) {
   };
   creanvas.NodeJsElement.prototype.drawMyself = function() {
     var element = this;
+    if (!element.elementType) {
+      return;
+    }
     element.controller.context.translate(element.x, element.y);
     element.controller.context.rotate(element.angle || 0);
     element.controller.context.scale(element.scale.x || 1, element.scale.y || 1);

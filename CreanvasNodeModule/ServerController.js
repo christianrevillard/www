@@ -163,28 +163,21 @@ Controller.prototype.getElementByTouchIdentifier = function(touchId) {
 	});
 	return byIdentifier.length > 0 ? byIdentifier[0] : null;
 };
+Controller.prototype.add = function(element){
+	this.elements.push(element);
+	return element;	
+};
 
 Controller.prototype.addElement = function(elementTemplate) {
-	var controller = this;
-
-	var element = new serverElement.Element(controller, elementTemplate);
-
-	controller.elements.push(element);
-
-	return element;
+	return this.add(new serverElement.Element(this, elementTemplate));
 };
 
 Controller.prototype.addCircle = function(elementTemplate) {
-	var controller = this;
+	return this.add(new circle.CircleElement(this, elementTemplate));
+};
 
-	var x= new aab.AxeAlignedBox(controller, elementTemplate);
-	console.log(x.id);
-	var element = new circle.CircleElement(controller, elementTemplate);
-	console.log(element.id);
-
-	controller.elements.push(element);
-
-	return element;
+Controller.prototype.addAxeAlignedBox = function(elementTemplate) {
+	return this.add(new aab.AxeAlignedBox(this, elementTemplate));
 };
 
 Controller.prototype.stop = function() {	

@@ -1,59 +1,46 @@
-var Vector = function(x, y, z){
+var Vector = function(x, y, z) {
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0;	
 };
 
-// u:tangent, v:normal. By two points on tangent 
-var getUnitVectors = function(x1, y1, x2, y2)
-{
-	var dx = x2-x1; 
-	var dy = y2-y1;
-	var longueur = Math.sqrt(dx*dx + dy*dy);
-	return {
-		u:new Vector(dx/longueur, dy/longueur,0),
-		v:new Vector(-dy/longueur, dx/longueur,0),
-		w:new Vector(0,0,0)
-	};
+var Basis = function(v1, v2, v3) {
+	this.v1 = v1;
+	this.v2 = v2;
+	this.v3 = v3 || new Vector(0, 0, 1);		
 };
 
-//u:tangent, v:normal. By two points on normal 
-var getUnitVectorsByNormal = function(x1, y1, x2, y2)
-{
-	var dx = x2-x1; 
-	var dy = y2-y1;
-	var longueur = Math.sqrt(dx*dx + dy*dy);
-	return {
-		u:new Vector(dy/longueur, -dx/longueur,0),
-		v:new Vector(dx/longueur, dy/longueur,0),
-		w:new Vector(0,0,0)
-	};
+Vector.scalarProduct = function(v1, v2) {
+	return v1.x * v2.x + v1.y * v2.y + v1.z || 0 * v2.z || 0;
 };
 
-var scalarProduct = function(v1, v2)
-{
-	return v1.x * v2.x + v1.y * v2.y;
-};
-
-var vectorProduct = function(v1,v2)
-{
+Vector.vectorProduct = function(v1,v2) {
 	return new Vector(
 			v1.y * v2.z - v1.z * v2.y,				
 			v1.z * v2.x - v1.x * v2.z,	
 			v1.x * v2.y - v1.y * v2.x);
 };	
 
-Vector.prototype.getCoordinates = function(unitVectors)
-{
+Vector.sum = function(v1,v2) {
+	return new Vector(
+			v1.x + v2.x,				
+			v1.y + v2.y,				
+			v1.z + v2.z);
+};	
+
+Vector.getBasisFromFirstVector = function(v1) {
+	return new Basis(
+		v1,
+		new Vector(-v1.y, v1.x, 0),
+		new Vector(0,0,1));
+};
+
+Vector.prototype.getCoordinates = function(base) {
 	return {
-		u: scalarProduct(this,unitVectors.u),
-		v: scalarProduct(this,unitVectors.v),
-		w: scalarProduct(this,unitVectors.w)
+		x: Vector.scalarProduct(this,base.v1),
+		y: Vector.scalarProduct(this,base.v2),
+		z: Vector.scalarProduct(this,base.v3)
 	};
 };
 
 exports.Vector = Vector;
-exports.getUnitVectors = getUnitVectors;
-exports.getUnitVectorsByNormal = getUnitVectorsByNormal;
-exports.scalarProduct = scalarProduct;
-exports.vectorProduct = vectorProduct;

@@ -52,21 +52,41 @@ MovingElement.prototype.commitMove = function()
 {	
 	if(!this.dt)
 		return;
+		
+//	console.log('Commiting move for dt = ' + this.dt);
+
+	if (!this.wasAdjusted){
+		this.speed.x += this.acceleration.x * this.dt;
+		this.speed.y += this.acceleration.y * this.dt;
+		this.speed.angle += this.acceleration.angle * this.dt;
+	}
 	
-	this.speed.x += this.acceleration.x * this.dt;
-	this.speed.y += this.acceleration.y * this.dt;
-	this.speed.angle += this.acceleration.angle * this.dt;
-	
+	//console.log('new speed is ' + this.speed.y + ' at ' + this.parent.position.y);
+
 	this.originalPosition = null;
 	this.originalScale = null;
 	this.originalBoundaryBox = null;
+	this.wasAdjusted = false;
 	
 	this.dt = null;
+	
+	/*var ec = this.parent.solid.mass * this.speed.y * this.speed.y / 2;
+	var ep = this.parent.solid.mass * 100 * (500-this.parent.position.y);
+	console.log ("E: " + Math.round(ec + ep) + " (ec: " + Math.round(ec) + ", ep: " + Math.round(ep) + ") - y: " + Math.round(this.parent.position.y) + 
+			' - vy: ' + Math.round(this.speed.y) +
+			' - ay: ' + this.acceleration.y);
+	console.log ();*/
 };
 
 MovingElement.prototype.updatePosition = function(dt) {	
 
-	if (this.speed.x==0 && this.speed.y==0 && this.speed.angle==0 && this.acceleration.x==0 && this.acceleration.y==0) // tood add scale
+	var useAcceleration = 1;
+	if (this.originalPosition){
+		this.wasAdjusted = true;
+		useAcceleration = 0;
+	}
+	
+	if (this.speed.x==0 && this.speed.y==0 && this.speed.angle==0 && this.acceleration.x==0 && this.acceleration.y==0 && this.acceleration.angle==0) // tood add scale
 	{
 		this.dt=0;
 
@@ -83,9 +103,12 @@ MovingElement.prototype.updatePosition = function(dt) {
 	this.dt = dt;
 
 	this.parent.position = {
-		x: this.originalPosition.x + this.speed.x * dt,
-		y: this.originalPosition.y + this.speed.y * dt,
-		angle: this.originalPosition.angle + this.speed.angle * dt
+		x: this.originalPosition.x + (this.speed.x  + useAcceleration*this.acceleration.x * dt/2) * dt,
+		y: this.originalPosition.y + (this.speed.y + useAcceleration*this.acceleration.y * dt/2) * dt,
+		angle: this.originalPosition.angle + (this.speed.angle + useAcceleration*this.acceleration.angle * dt/2) * dt
+//		x: this.originalPosition.x + this.speed.x * dt,
+//		y: this.originalPosition.y + this.speed.y * dt,
+//		angle: this.originalPosition.angle + this.speed.angle * dt
 	};
 
 	this.parent.scale = {

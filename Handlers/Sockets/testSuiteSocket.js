@@ -1,6 +1,9 @@
 var collisionSolver = require('../../CreanvasNodeModule/CollisionSolver/CollisionSolver');
 var circle = require("../../CreanvasNodeModule/ElementTypes/Circle");
+var axeAlignedBox = require("../../CreanvasNodeModule/ElementTypes/AxeAlignedBox");
 var serverElement = require("../../CreanvasNodeModule/ServerElement");
+var ccHandler = require('../../CreanvasNodeModule/CollisionSolver/CircleCircleCollision');
+var cbHandler = require('../../CreanvasNodeModule/CollisionSolver/AxeAlignedBoxCircleCollision');
 
 // called only for the first of all users
 var startApplication = function(socketName) {
@@ -76,7 +79,7 @@ var TestSuite = function(collision, socket){
 			updates = solver.getCollisionDetails(
 					element,
 					other,
-					{x:0,y:0});
+					new ccHandler.CircleCircleCollision());
 			
 			result = 
 				(updates.e1.dSpeedX == -100) && 
@@ -92,7 +95,7 @@ var TestSuite = function(collision, socket){
 				'; e1.dSpeedAngle = 0 ? ' + (updates.e1.dSpeedAngle == 0 ? "OK":"ERROR") + 
 				'; e2.dSpeedX = 100 ? ' + (updates.e2.dSpeedX == 100 ? "OK":"ERROR") + 
 				'; e2.dSpeedY = 0 ? ' + (updates.e2.dSpeedY == 0 ? "OK":"ERROR") + 
-				'; e2.dSpeedAngle = 0 ? ' + (updates.e2.dSpeedAngle == 0 ? "OK":"ERROR"); 
+				'; e2.dSpeedAngle = 0 ? ' + (updates.e2.dSpeedAngle == 0 ? "OK":"ERROR") + updates.e2.dSpeedAngle; 
 			
 			// do some stuff here...
 			socket.emit(
@@ -116,20 +119,24 @@ var TestSuite = function(collision, socket){
 						moving: {speed:{x:0,y:-50}}
 					});
 
-			other = new serverElement.Element(
+			other = new axeAlignedBox.AxeAlignedBox(
 					mockController, 
 					{
 						name: 'bar1',
 						position: {x: 0, y: 0},			
-						solid: {mass:1},						
+						solid: {mass:1},
+						left:-50,
+						right:50,
+						top:0,
+						bottom:0
  					});
 			
-			other.getMomentOfInertia =  function() { return 1*100*100/12;};	// length:100 I=m.l.l/12,
+			other.getMomentOfInertia =  function() { return 1*100*100/12;};	// length:100 I=m.l.l/12, override Infinity
 			
 			updates = solver.getCollisionDetails(
 					element,
 					other,
-					{x:50,y:0});
+					new cbHandler.AxeAlignedBoxCircleCollision());
 			
 			result = true;
 			resultDetails = '';
@@ -155,7 +162,7 @@ var TestSuite = function(collision, socket){
 			result &= assert.success;
 			resultDetails += assert.resultDetails;
 			
-			assert = this.assertEqual('e2.dSpeedAngle', -1.2, updates.e2.dSpeedAngle, 0.01);
+			assert = this.assertEqual('e2.dSpeedAngle', 1.2, updates.e2.dSpeedAngle, 0.01);
 			result &= assert.success;
 			resultDetails += assert.resultDetails;
 			
