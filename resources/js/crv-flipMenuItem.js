@@ -11,44 +11,54 @@ Object.defineProperty(flipMenuItemPrototype, "hoverHeight", { writable: true});
 
 flipMenuItemPrototype.drawFront = function()
 {
-	this.drawCommon(true, 1.5 - Math.cos(this.angle)/2, this.angle, this.imgFront, "rgba(255, 0, 0, 1)");
+	//front 0 : zoom=1 pi/2, zoom=X (hover/width+1)/2  (1+X)/2 X de 1 à  hover/width
+	// cos varie de 1 à 0     1+(hover/width-1)*(1-cos)/2      
+	this.drawCommon(true, 1+(this.hoverWidth/this.width-1)*(1-Math.cos(this.angle))/2, this.angle, this.imgFront, "rgba(255, 0, 0, 1)");
+
+	//	this.drawCommon(true, 1.5 -Math.cos(this.angle)/2, this.angle, this.imgFront, "rgba(255, 0, 0, 1)");
 };
 
 flipMenuItemPrototype.drawBack = function()
 {
-	this.drawCommon(false, 1.5 + Math.cos(Math.PI-this.angle)/2, Math.PI-this.angle, this.imgBack, "rgba(0, 0, 255, 1)");
+	//front pi/2 : zoom=(hover/width+1)/2     pi, zoom=hover/width
+	this.drawCommon(false, 1+(this.hoverWidth/this.width-1)*(1-Math.cos(this.angle))/2, Math.PI-this.angle, this.imgBack, "rgba(0, 0, 255, 1)");
+//	this.drawCommon(false, 1.5  + Math.cos(Math.PI-this.angle)/2, Math.PI-this.angle, this.imgBack, "rgba(0, 0, 255, 1)");
 };
 
 
 flipMenuItemPrototype.drawCommon = function(isFront, zoom, drawingAngle, img, backgroundColor)
 {
 	var ctx = this.canvas.getContext('2d');
-	ctx.clearRect(0,0,200,200);
-	ctx.translate(100, 100);
+	ctx.clearRect(0,0,this.hoverWidth,this.hoverHeight);
+
+	ctx.translate(this.hoverWidth/2, this.hoverHeight/2);
 	ctx.rotate(-Math.PI/4);
 	ctx.scale(Math.cos(drawingAngle)*zoom, zoom);
 	ctx.rotate(Math.PI/4);
 	
+	var innerWidth = this.width-4;
+	var innerHeight = this.height-4;
+	
 	if (img)
 	{
-		ctx.drawImage(img, -48,-48, 96, 96);
+		ctx.drawImage(img, -innerWidth/2,-innerHeight/2, innerWidth, innerHeight);
 	}
 	else
 	{
 		ctx.fillStyle = backgroundColor;
-		ctx.fillRect(-48,-48,96,96);
+		ctx.fillRect(-innerWidth/2,-innerHeight/2, innerWidth, innerHeight);
 	}
 	// text
 	if (this.text)
 	{
 		ctx.fillStyle = "rgba(0, 0, 0, 1)";
 		ctx.font="20px Georgia";
-		ctx.fillText(this.text ,-40,0);			
+		ctx.fillText(this.text ,-40,0);		// to do 	
 	}
 	
 	// transparency gradient
 	ctx.globalCompositeOperation = "destination-out";		
-	var gradient = ctx.createLinearGradient(-50,50,50,-50)
+	var gradient = ctx.createLinearGradient(-this.width/2,this.height/2,this.width/2,-this.height/2)
 	if (isFront)
 	{
 		gradient.addColorStop(0.0,"rgba(0, 0, 0, 1)"); // 1=startgrad for front, 0 for back
@@ -62,22 +72,22 @@ flipMenuItemPrototype.drawCommon = function(isFront, zoom, drawingAngle, img, ba
 		gradient.addColorStop(1.0,"rgba(0, 0, 0, 1)"); // stopalpha=0
 	}
 	ctx.fillStyle = gradient;
-	ctx.fillRect(-48,-48,96,96);
+	ctx.fillRect(-innerWidth/2,-innerHeight/2, innerWidth, innerHeight);
 	ctx.globalCompositeOperation = "source-over";		
 
 	ctx.strokeStyle= backgroundColor;
 	ctx.beginPath();
 	if(isFront)
 	{
-		ctx.moveTo(-48,-50);
-		ctx.lineTo(50,-50);
-		ctx.lineTo(50,48);
+		ctx.moveTo(-innerWidth/2,-this.height/2);
+		ctx.lineTo(this.width/2,-this.height/2);
+		ctx.lineTo(this.width/2,innerWidth/2);
 	}
 	else
 	{
-		ctx.moveTo(-50,-48);
-		ctx.lineTo(-50,50);
-		ctx.lineTo(48,50);
+		ctx.moveTo(-this.width/2,-innerWidth/2);
+		ctx.lineTo(-this.width/2,this.height/2);
+		ctx.lineTo(innerWidth/2,this.height/2);
 	}
 	ctx.lineWidth = 2 - Math.cos(drawingAngle)
 	ctx.stroke();
@@ -103,7 +113,7 @@ flipMenuItemPrototype.rotate = function(){
 	{
 		setTimeout(
 			function(){me.rotate();},
-			20);
+			40);
 	}
 	else
 	{
@@ -137,6 +147,11 @@ flipMenuItemPrototype.flip = function(deltaAngle){
 flipMenuItemPrototype.createdCallback = function() { 
 	var container = this;
 
+	this.width = this.getAttribute('width');
+	this.height = this.getAttribute('height');
+	this.hoverWidth = this.getAttribute('hoverWidth');
+	this.hoverHeight = this.getAttribute('hoverHeight');
+	
 	if (this.hasAttribute('href'))
 	{	
 		var link = document.createElement( "a" );
@@ -144,19 +159,19 @@ flipMenuItemPrototype.createdCallback = function() {
 		this.appendChild(link);
 		container = link;
 	}
-
+	
 	var mouseStuff = document.createElement( "div" );
-	mouseStuff.style.width = "100px";
-	mouseStuff.style.height = "100px";
+	mouseStuff.style.width = this.width + "px";
+	mouseStuff.style.height = this.height + "px";
 	mouseStuff.style.position = "absolute";
-	mouseStuff.style.left = "50"; 
-	mouseStuff.style.top = "50"; 
+	mouseStuff.style.left = (this.hoverWidth - this.width)/2; 
+	mouseStuff.style.top = (this.hoverHeight - this.height)/2; 
 	container.appendChild(mouseStuff);
 
 	
 	this.canvas = document.createElement( "canvas" );
-	this.canvas.width = 200;
-	this.canvas.height = 200;
+	this.canvas.width = this.hoverWidth;
+	this.canvas.height = this.hoverHeight;
 	this.appendChild(this.canvas);
 
 	if (this.hasAttribute('frontImage'))
@@ -165,8 +180,8 @@ flipMenuItemPrototype.createdCallback = function() {
 		imgFront.src = this.getAttribute('frontImage');
 		imgFront.style.display="none";
 		imgFront.className="frontImg"; 
-		imgFront.width = 100;
-		imgFront.height = 100;
+		imgFront.width = this.width;
+		imgFront.height = this.height;
 		this.appendChild(imgFront);
 		this.imgFront = imgFront;
 	}
@@ -177,8 +192,8 @@ flipMenuItemPrototype.createdCallback = function() {
 		imgBack.src = this.getAttribute('backImage');
 		imgBack.style.display="none";
 		imgBack.className="backImg"; 
-		imgBack.width = 100;
-		imgBack.height = 100;
+		imgBack.width = this.width;
+		imgBack.height = this.height;
 		this.appendChild(imgBack);
 		this.imgBack = imgBack;
 	}
@@ -192,17 +207,17 @@ flipMenuItemPrototype.createdCallback = function() {
 	mouseStuff.addEventListener(
 			'mouseover',
 			function(){
-				me.flip(2*Math.PI/50);
+				me.flip(2*Math.PI/20);
 			});
 
 	mouseStuff.addEventListener(
 			'mouseout',
 			function(){
-				me.flip(-2*Math.PI/50);
+				me.flip(-2*Math.PI/20);
 			});
 	
 	this.angle = Math.PI;				
-	this.flip(-2*Math.PI/80);
+	this.flip(-2*Math.PI/20);
 };
 
 crv.FlipMenuItem = document.registerElement('crv-flipMenuItem', {prototype: flipMenuItemPrototype});
