@@ -20,7 +20,7 @@ var getHandle = function(globals)
 		}
 		
 		// just so the browser is happy !
-		//response.writeHead(200, {"Content-Type": "text/plain"});
+		response.writeHead(200, {"Content-Type": "text/plain"});
 		response.end();				
 	};
 };

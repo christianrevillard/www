@@ -1,53 +1,34 @@
 @echo ON
 
+SET source=C:\Users\Christian\git
+SET tools=C:\Users\Christian\Development\Tools
+
 call deployCreanvas
 call deployNodeServer
 call deployCreanvasNodeModule
 
-cd \Users\Christian\Development\Projects\WebClientApps
-cd chess
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd collision
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd flipper
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd jsevents
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd performance
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd solarSystem
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd testSuite
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd tictactoe
-call ..\..\www\deployWebClientApp.bat
-cd ..
-cd ..\www
+cd %source%\WebClientApp-collision
+call %source%\www\deployWebClientApp.bat
 
-cd ..\WebServerApps
-cd ajaxTest
-call ..\..\www\deployWebServerApp.bat
-cd ..
-cd chat
-call ..\..\www\deployWebServerApp.bat
-cd ..
-cd collision
-call ..\..\www\deployWebServerApp.bat
-cd ..
-cd tictactoe
-call ..\..\www\deployWebServerApp.bat
-cd ..
-cd pong
-call ..\..\www\deployWebServerApp.bat
-cd ..
-cd testSuite
-call ..\..\www\deployWebServerApp.bat
-cd ..
-cd ..\www
+cd %source%\WebClientApp-flipper
+call %source%\www\deployWebClientApp.bat
+
+cd %source%\WebClientApp-solarSystem
+call %source%\www\deployWebClientApp.bat
+
+cd %source%\WebClientApp-tictactoe
+call %source%\www\deployWebClientApp.bat
+
+cd %source%\WebServerApp-Chat
+call %source%\www\deployWebServerApp.bat
+
+cd %source%\WebServerApp-Collision
+call %source%\www\deployWebServerApp.bat
+
+cd %source%\WebServerApp-Tictactoe
+call %source%\www\deployWebServerApp.bat
+
+cd %source%\WebServerApp-Pong
+call %source%\www\deployWebServerApp.bat
+
+cd %source%\www

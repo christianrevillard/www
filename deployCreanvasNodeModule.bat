@@ -1,13 +1,13 @@
 @echo ON
 
-cd \Users\Christian\Development\Projects\Libs\CreanvasNodeModule\Client
-
+SET source=C:\Users\Christian\git
+SET tools=C:\Users\Christian\Development\Tools
 
 java ^
--jar ..\..\..\..\Tools\closure-compiler\compiler.jar ^
+-jar %tools%\closure-compiler\compiler.jar ^
 --js ^
-	./*.js ^
---js_output_file ..\..\..\www\resources\lib\CreanvasNodeClient.js ^
+	%source%\CreanvasNodeModule\Client\*.js ^
+--js_output_file %source%\www\resources\lib\CreanvasNodeClient.js ^
 --define TEST=false ^
 --define DEBUG=true ^
 --formatting=pretty_print ^
@@ -16,17 +16,13 @@ java ^
 REM --compilation_level ADVANCED_OPTIMIZATIONS
 REM --compilation_level SIMPLE_OPTIMIZATIONS
 
-cd ..
+copy %source%\CreanvasNodeModule\Server\* %source%\www\CreanvasNodeModule\
 
-copy Server\* ..\..\www\CreanvasNodeModule\
+if not exist %source%\www\CreanvasNodeModule\Decorators mkdir %source%\www\CreanvasNodeModule\Decorators
+copy %source%\CreanvasNodeModule\Server\Decorators\* %source%\www\CreanvasNodeModule\Decorators\
 
-if not exist ..\..\www\CreanvasNodeModule\Decorators mkdir ..\..\www\CreanvasNodeModule\Decorators
-copy Server\Decorators\* ..\..\www\CreanvasNodeModule\Decorators\
+if not exist %source%\www\CreanvasNodeModule\CollisionSolver mkdir %source%\www\CreanvasNodeModule\CollisionSolver
+copy %source%\CreanvasNodeModule\Server\CollisionSolver\* %source%\www\CreanvasNodeModule\CollisionSolver\
 
-if not exist ..\..\www\CreanvasNodeModule\CollisionSolver mkdir ..\..\www\CreanvasNodeModule\CollisionSolver
-copy Server\CollisionSolver\* ..\..\www\CreanvasNodeModule\CollisionSolver\
-
-if not exist ..\..\www\CreanvasNodeModule\ElementTypes mkdir ..\..\www\CreanvasNodeModule\ElementTypes
-copy Server\ElementTypes\* ..\..\www\CreanvasNodeModule\ElementTypes\
-
-cd ..\..\www
+if not exist %source%\www\CreanvasNodeModule\ElementTypes mkdir %source%\www\CreanvasNodeModule\ElementTypes
+copy %source%\CreanvasNodeModule\Server\ElementTypes\* %source%\www\CreanvasNodeModule\ElementTypes\

@@ -1,24 +1,23 @@
 @echo ON
 
-cd \Users\Christian\Development\Projects\Libs\CreanvasJS
+SET source=C:\Users\Christian\git
+SET tools=C:\Users\Christian\Development\Tools
 
 java ^
--jar ..\..\..\Tools\closure-compiler\compiler.jar ^
+-jar %tools%\closure-compiler\compiler.jar ^
 --js ^
-	./Core/*.js ^
-	./Creanvas/*.js ^
-	./Creanvas/ElementDecorators/*.js ^
-	./Creevents/*.js ^
-	./CreHelpers/*.js ^
-	./Crelog/*.js ^
-	./CreanvasNodeClient/*.js ^
---js_output_file ..\..\www\resources\lib\Creanvas.js ^
+	%source%\CreanvasJS/Core/*.js ^
+	%source%\CreanvasJS/Creanvas/*.js ^
+	%source%\CreanvasJS/Creanvas/ElementDecorators/*.js ^
+	%source%\CreanvasJS/Creevents/*.js ^
+	%source%\CreanvasJS/CreHelpers/*.js ^
+	%source%\CreanvasJS/Crelog/*.js ^
+	%source%\CreanvasJS/CreanvasNodeClient/*.js ^
+--js_output_file %source%\www\resources\lib\Creanvas.js ^
 --define TEST=false ^
 --define DEBUG=false ^
---externs ./externs.js ^
+--externs %source%\CreanvasJS/externs.js ^
 --compilation_level ADVANCED_OPTIMIZATIONS
 REM --compilation_level WHITESPACE_ONLY
 REM --compilation_level SIMPLE_OPTIMIZATIONS
 REM --formatting=pretty_print ^
-
-cd ..\..\www

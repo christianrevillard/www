@@ -1,9 +1,7 @@
  @echo ON
 
-cd \Users\Christian\Development\Projects\Libs\NodeServer
+SET source=C:\Users\Christian\git
 
-copy Handlers\Generic\* ..\..\www\Handlers\Generic\
-copy Handlers\Sockets\* ..\..\www\Handlers\Sockets\
-copy ServerCore\* ..\..\www\ServerCore\
-
-cd ..\..\www
+copy %source%\NodeServer\Handlers\Generic\* %source%\www\Handlers\Generic\
+copy %source%\NodeServer\Handlers\Sockets\* %source%\www\Handlers\Sockets\
+copy %source%\NodeServer\ServerCore\* %source%\www\ServerCore\

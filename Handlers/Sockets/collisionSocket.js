@@ -56,18 +56,6 @@ var CollisionTest = function(collision, socket){
 		solid: {mass:Infinity}
 	});
 
-	/*
-	this.controller.addAxeAlignedBox({
-		name: 'middle',
-		clientType: 'verticalWall',
-		left:0,
-		right:20,
-		top:0,
-		bottom:250,
-		position: {x: 340, y: 125},			
-		solid: {mass:Infinity}
-	});*/
-
 	this.controller.addAxeAlignedBox({
 		name: 'top',
 		clientType: 'horizontalWall',
@@ -141,8 +129,8 @@ var CollisionTest = function(collision, socket){
 	});
 */
 				
-	for (var i=100;i<650;i=i+52) 
-	for (var j=200;j<400;j=j+71)
+	for (var i=100;i<650;i=i+100) 
+	for (var j=200;j<400;j=j+100)
 //	for (var i=300;i<301;i=i+100) 
 //		for (var j=300;j<301;j=j+100)
 	{
@@ -160,8 +148,8 @@ var CollisionTest = function(collision, socket){
 			clientType: 'bigRound',
 			radius: 25,
 			position: {x: i, y: j-1.2*(i/5)+10+1+25},			
-			solid: {mass:2, collisionCoefficient:0.98},
-			moving: {speed:{x:0,y:0},acceleration:{y:100}}
+			solid: {mass:2, collisionCoefficient:1},
+			moving: {speed:{x:0,y:0}}//,acceleration:{y:100}}
 //			moving: {speed:{x:i-300,y:j-200},acceleration:{y:0}}
 		});	
 	};
