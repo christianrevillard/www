@@ -5,61 +5,119 @@
 		<script src="/files/js/testMenuItem.js"></script>
 		<script src="/files/js/crv-flipMenuItem.js"></script>
 	</head>
+	
+	
 	<body>
-		<table>	
-			<tr><td><a href="/files/html/uploadImage.html">Upload image test</a></td></tr>
-			<tr><td><a href="/upload">Upload image test alias</a></td></tr>
-			<tr><td><a href="/files/html/ajaxTest.html">Client script test</a></td></tr>
-			<tr><td><a href="/files/html/testSuite.html">Client script test</a></td></tr>
-			<tr><td><a href="/files/html/performance.html">Drawing perf test</a></td></tr>
-			<tr><td><a href="/files/html/jsevents.html">Events test</a></td></tr>
-			<tr><td><a href="/files/html/chess.html">JS Chess</a></td></tr>
-			<tr><td><a href="/files/html/solarSystem.html">Solar system test</a></td></tr>
-			<tr><td><a href="/files/html/tictactoe.html">Tic Tac Toe</a></td></tr>
-			<tr><td><a href="/files/html/collision.html">Test Collisions</a></td></tr>			
-			<tr><td><a href="/files/html/flipper.html">Flipper</a></td></tr>
-			<tr><td><a href="/files/html/chat.html">Websocket Chat</a></td></tr>
-			<tr><td><a href="/tictactoe">WebSocket Tic tac toe</a></td></tr>
-			<tr><td><a href="/collision">WebSocket collision</a></td></tr>
-			<tr><td><a href="/files/html/pongClient.html">Pong</a></td></tr>
-			<tr><td><a href="/files/html/myFiddler.html">myFiddler</a></td></tr>
-		</table>
+		<crv-flipmenuitem 
+			style="position: absolute;left:50px;top:50px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/HydrangeasMini.jpg' backImage='/files/img/JellyfishMini.jpg'
+			href='/upload'
+			text='Upload image'></crv-flipmenuitem>
 
 		<crv-flipmenuitem 
-			style="position: absolute;left:100px;top:200px;"
-			width="100"
-			height="100"
-			hoverWidth="200"
-			hoverHeight="200"
-			frontImage='/files/img/Koala.jpg' 
-			backImage='/files/img/Desert.jpg'
-			href='/files/html/myFiddler.html'
-			text='FIDDLER'
-			></crv-flipmenuitem>
+			style="position: absolute;left:200px;top:50px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/JellyfishMini.jpg' backImage='/files/img/TulipsMini.jpg'
+			href='/files/html/ajaxTest.html'
+			text='Ajax'></crv-flipmenuitem>
 
 		<crv-flipmenuitem 
-			style="position: absolute;left:100px;top:450px;"
-			width="150"
-			height="150"
-			hoverWidth="200"
-			hoverHeight="200"
-			frontImage='/files/img/Hydrangeas.jpg' 
-			backImage='/files/img/Jellyfish.jpg'
-			href='/files/html/pongClient.html'
-			text='PONG'
-			></crv-flipmenuitem>
+			style="position: absolute;left:350px;top:50px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/TulipsMini.jpg' backImage='/files/img/ChrysanthemumMini.jpg'
+			href='/files/html/testSuite.html'
+			text='Test suite'></crv-flipmenuitem>
 
 		<crv-flipmenuitem 
-			style="position: absolute;left:100px;top:700px;"
-			width="200"
-			height="200"
-			hoverWidth="200"
-			hoverHeight="200"
-			frontImage='/files/img/Lighthouse.jpg' 
-			backImage='/files/img/Penguins.jpg'
+			style="position: absolute;left:500px;top:50px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/ChrysanthemumMini.jpg' backImage='/files/img/LighthouseMini.jpg' 
+			href='/files/html/performance.html'
+			text='Performance'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:50px;top:200px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/LighthouseMini.jpg'  backImage='/files/img/PenguinsMini.jpg'
+			href='/files/html/jsevents.html'
+			text='Events'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:200px;top:200px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/PenguinsMini.jpg' backImage='/files/img/KoalaMini.jpg'
+			href='/files/html/chess.html'
+			text='Chess'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:350px;top:200px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/KoalaMini.jpg' backImage='/files/img/DesertMini.jpg'
+			href='/files/html/solarSystem.html'
+			text='Solar system'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:500px;top:200px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/DesertMini.jpg' backImage='/files/img/HydrangeasMini.jpg' 
+			href='/files/html/tictactoe.html'
+			text='Tic tac toe'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:50px;top:350px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/JellyfishMini.jpg' backImage='/files/img/TulipsMini.jpg'
+			href='/files/html/collision.html'
+			text='Collisions'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:200px;top:350px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/TulipsMini.jpg' backImage='/files/img/ChrysanthemumMini.jpg'
+			href='/files/html/flipper.html'
+			text='Flipper'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:350px;top:350px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/ChrysanthemumMini.jpg' backImage='/files/img/LighthouseMini.jpg' 
 			href='/files/html/chat.html'
-			text='CHAT'
-			></crv-flipmenuitem>
+			text='Chat'></crv-flipmenuitem>
 
+		<crv-flipmenuitem 
+			style="position: absolute;left:500px;top:350px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/ChrysanthemumMini.jpg' backImage='/files/img/LighthouseMini.jpg' 
+			href='/files/html/chat.html'
+			text='Chat'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:50px;top:500px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/LighthouseMini.jpg'  backImage='/files/img/PenguinsMini.jpg'
+			href='/tictactoe'
+			text='Websocket Tic Tac Toe'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:200px;top:500px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/PenguinsMini.jpg' backImage='/files/img/KoalaMini.jpg'
+			href='/collision'
+			text='Websocket Collisions'></crv-flipmenuitem>
+
+		<crv-flipmenuitem 
+			style="position: absolute;left:350px;top:500px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/KoalaMini.jpg' backImage='/files/img/DesertMini.jpg'
+			href="/files/html/pongClient.html"
+			text='Pong'></crv-flipmenuitem>
+	
+		<crv-flipmenuitem 
+			style="position: absolute;left:500px;top:500px;"
+			width="150" height="150" hoverWidth="200" hoverHeight="200"
+			frontImage='/files/img/DesertMini.jpg' backImage='/files/img/HydrangeasMini.jpg' 
+			href="/files/html/myFiddler.html"
+			text='Fiddler'></crv-flipmenuitem>	
 	</body>
 </html>
